@@ -3375,6 +3375,85 @@
                 showToast('Не удалось подключиться к GitHub, проверьте токен', 'error');
             }
         }
+
+        // ============================================================================
+        // 10. ХОЛСТ ДЛЯ РИСОВАНИЯ И ЖИВАЯ КАМЕРА
+        // ============================================================================
+        function initDrawingCanvas() {
+            const canvas = document.getElementById('drawingCanvas');
+            if (!canvas) return;
+            canvas.width = 480;
+            canvas.height = 480;
+            const ctx = canvas.getContext('2d');
+
+            ctx.fillStyle = '#FFFDF9';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            saveCanvasSnapshot();
+
+            function getCanvasPos(e) {
+                const rect = canvas.getBoundingClientRect();
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                return {
+                    x: (clientX - rect.left) * (canvas.width / rect.width),
+                    y: (clientY - rect.top) * (canvas.height / rect.height)
+                };
+            }
+
+            function startStroke(e) {
+                isDrawing = true;
+                const pos = getCanvasPos(e);
+                ctx.beginPath();
+                ctx.moveTo(pos.x, pos.y);
+                ctx.strokeStyle = brushColor;
+                ctx.lineWidth = Number(document.getElementById('brushSizeSlider').value || 5);
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+            }
+
+            function moveStroke(e) {
+                if (!isDrawing) return;
+                if (e.cancelable) e.preventDefault();
+                const pos = getCanvasPos(e);
+                ctx.lineTo(pos.x, pos.y);
+                ctx.stroke();
+            }
+
+            function endStroke() {
+                if (!isDrawing) return;
+                isDrawing = false;
+                ctx.closePath();
+                saveCanvasSnapshot();
+            }
+
+            canvas.addEventListener('mousedown', startStroke);
+            canvas.addEventListener('mousemove', moveStroke);
+            window.addEventListener('mouseup', endStroke);
+
+            canvas.addEventListener('touchstart', startStroke, { passive: false });
+            canvas.addEventListener('touchmove', moveStroke, { passive: false });
+            window.addEventListener('touchend', endStroke);
+        }
+
+        function setBrushColor(color, btnEl) {
+            brushColor = color;
+            document.querySelectorAll('.color-swatch').forEach(b => {
+                b.classList.remove('ring-2', 'ring-offset-2', 'ring-brand-500');
+            });
+            if (btnEl) {
+                btnEl.classList.add('ring-2', 'ring-offset-2', 'ring-brand-500');
+            }
+        }
+
+        function clearDrawingCanvas() {
+            const canvas = document.getElementById('drawingCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#FFFDF9';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            saveCanvasSnapshot();
+        }
+
         function saveCanvasSnapshot() {
             const canvas = document.getElementById('drawingCanvas');
             if (canvasHistory.length > 15) canvasHistory.shift();
@@ -3397,6 +3476,44 @@
             };
             img.src = previousData;
         }
+
+        function setCreatorMode(mode) {
+            currentCreatorMode = mode;
+            const drawPanel = document.getElementById('creatorDrawPanel');
+            const photoPanel = document.getElementById('creatorPhotoPanel');
+            const btnDraw = document.getElementById('modeBtnDraw');
+            const btnPhoto = document.getElementById('modeBtnPhoto');
+
+            if (mode === 'draw') {
+                drawPanel.classList.remove('hidden');
+                photoPanel.classList.add('hidden');
+                btnDraw.className = 'px-3 py-1.5 rounded-xl bg-white text-slate-900 shadow-sm transition flex items-center gap-1.5';
+                btnPhoto.className = 'px-3 py-1.5 rounded-xl text-slate-500 hover:text-slate-800 transition flex items-center gap-1.5';
+                stopLiveCamera();
+            } else {
+                drawPanel.classList.add('hidden');
+                photoPanel.classList.remove('hidden');
+                btnPhoto.className = 'px-3 py-1.5 rounded-xl bg-white text-slate-900 shadow-sm transition flex items-center gap-1.5';
+                btnDraw.className = 'px-3 py-1.5 rounded-xl text-slate-500 hover:text-slate-800 transition flex items-center gap-1.5';
+            }
+        }
+
+        async function startLiveCamera() {
+            try {
+                mediaStream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: 'user', width: { ideal: 720 }, height: { ideal: 720 } },
+                    audio: false
+                });
+                const video = document.getElementById('cameraStreamVideo');
+                video.srcObject = mediaStream;
+                video.classList.remove('hidden');
+                document.getElementById('cameraPlaceholder').classList.add('hidden');
+                document.getElementById('capturedPhotoPreview').classList.add('hidden');
+                document.getElementById('retakePhotoBtn').classList.add('hidden');
+                document.getElementById('cameraActiveControls').classList.remove('hidden');
+            } catch (e) {
+                showToast('Камера недоступна, выберите фото через кнопку «Выбрать / Снять»', 'error');
+            }
         }
 
         function stopLiveCamera() {
