@@ -248,8 +248,8 @@
                             <div class="text-xs font-medium text-slate-700 truncate" id="partnerMoodText">Скучаю по тебе!</div>
                         </div>
                     </div>
-                    <button onclick="switchTab('sync')" title="Связь с партнером" class="p-1 text-slate-400 hover:text-brand-600 transition shrink-0">
-                        <i data-lucide="link-2" class="w-3.5 h-3.5"></i>
+                    <button onclick="manualForceSync()" title="Обновить синхронизацию" class="p-1 text-slate-400 hover:text-brand-600 active:rotate-180 transition shrink-0">
+                        <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
                     </button>
                 </div>
             </div>
@@ -838,7 +838,7 @@
                         <p class="text-[11px] text-slate-400">Введите код второй половинки (ровно 10 латинских букв/цифр), чтобы соединить ваши аккаунты и включить счетчик дней:</p>
                         <div class="flex gap-2 pt-1">
                             <input id="enterPartnerCodeInput" type="text" maxlength="10" placeholder="Например: K8M2X9P4LQ" class="flex-1 bg-slate-50 border border-slate-200 rounded-2xl px-3.5 py-2.5 text-xs font-mono font-bold uppercase tracking-widest focus:outline-none focus:border-brand-500">
-                            <button onclick="linkWithPartnerCode()" class="bg-slate-900 hover:bg-slate-800 active:scale-95 text-white px-4 py-2.5 rounded-2xl text-xs font-semibold flex items-center gap-1.5 transition shrink-0">
+                            <button id="linkPartnerSubmitBtn" onclick="linkWithPartnerCode()" class="bg-slate-900 hover:bg-slate-800 active:scale-95 text-white px-4 py-2.5 rounded-2xl text-xs font-semibold flex items-center gap-1.5 transition shrink-0">
                                 <i data-lucide="link" class="w-3.5 h-3.5"></i>
                                 <span>Связать</span>
                             </button>
@@ -850,16 +850,16 @@
                         <div class="flex items-center justify-between">
                             <button type="button" onclick="handleDevCloudTap()" class="flex items-center gap-2 text-xs font-bold text-slate-800 text-left">
                                 <i data-lucide="lock" class="w-3.5 h-3.5 text-emerald-600"></i>
-                                <span>Конфиденциальность и облако GitHub</span>
+                                <span>Конфиденциальность и облако</span>
                             </button>
-                            <span id="githubCloudStatusBadge" class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-slate-200 text-slate-600">Локально</span>
+                            <span id="githubCloudStatusBadge" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">Облако активно</span>
                         </div>
                         <p class="text-[11px] text-slate-500 leading-relaxed">
-                            Пароли хранятся в виде хеша <code class="bg-white px-1 py-0.5 rounded border text-[10px]">SHA-256</code>. Синхронизация между телефонами работает по 10-значному коду пары.
+                            Пароли хранятся в виде хеша <code class="bg-white px-1 py-0.5 rounded border text-[10px]">SHA-256</code>. Синхронизация между телефонами работает автоматически по 10-значному коду пары.
                         </p>
                         <!-- Скрытая панель быстрой привязки GitHub Токена (открывается по 5 кликам на заголовок выше) -->
                         <div id="devGithubSetupBox" class="hidden pt-2 mt-2 border-t border-slate-200 space-y-2">
-                            <p class="text-[10px] font-bold text-brand-600 uppercase">Быстрая привязка GitHub Gist (для владельца):</p>
+                            <p class="text-[10px] font-bold text-brand-600 uppercase">Дополнительная привязка GitHub Gist (по желанию):</p>
                             <input id="devGhTokenInput" type="password" placeholder="Вставьте GitHub Token (ghp_...)" class="w-full bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 text-xs">
                             <input id="devGhGistInput" type="text" placeholder="Gist ID (необязательно — создастся сам)" class="w-full bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 text-xs">
                             <button type="button" onclick="saveDevGithubConfig()" class="w-full bg-slate-900 text-white py-1.5 rounded-xl text-xs font-semibold">Сохранить облако на устройстве</button>
@@ -1196,7 +1196,7 @@
                     this.ready = true;
                     if (window.onCloudBridgeReady) window.onCloudBridgeReady();
                 } catch (e) {
-                    console.warn('Используется локальное хранилище синхронизации:', e);
+                    console.warn('Используется встроенное облако синхронизации:', e);
                 }
             },
 
@@ -1249,12 +1249,138 @@
 
     <script>
         // ============================================================================
-        // 1. НАСТРОЙКА GITHUB КАК БЕСПЛАТНОГО СЕРВЕРА (ВШИВАЕТСЯ РАЗРАБОТЧИКОМ)
+        // 1. БЕСПЛАТНЫЙ АВТОМАТИЧЕСКИЙ ОБЛАЧНЫЙ СЕРВЕР (РАБОТАЕТ СРАЗУ БЕЗ ТОКЕНОВ!)
+        // + ПОДДЕРЖКА GITHUB GIST ПО ЖЕЛАНИЮ
         // ============================================================================
-        // Чтобы два телефона синхронизировались через GitHub без ввода токенов пользователями,
-        // вставьте сюда ваш GitHub Personal Access Token (с галочкой "gist") и ID созданного Gist:
-        const EMBEDDED_GITHUB_TOKEN = ''; // Например: 'ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
-        const EMBEDDED_MASTER_GIST_ID = ''; // Например: 'a1b2c3d4e5f6g7h8i9j0...' (если пусто — создастся автоматически)
+        const EMBEDDED_GITHUB_TOKEN = '';
+        const EMBEDDED_MASTER_GIST_ID = '';
+
+        // Мгновенный облачный движок для связи двух телефонов по 10-значному коду без настройки токенов
+        const instantRelayCloud = {
+            prefix: 'couple_space_v3_room_',
+            accountsTopic: 'couple_space_v3_accounts_global_idx',
+            eventSource: null,
+            pollTimer: null,
+
+            getTopic(pairCode) {
+                return this.prefix + String(pairCode || '').trim().toUpperCase();
+            },
+
+            async pushRoomState(pairCode, stateObj) {
+                if (!pairCode || !stateObj) return;
+                try {
+                    await fetch(`https://ntfy.sh/${this.getTopic(pairCode)}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
+                        body: JSON.stringify(stateObj)
+                    });
+                } catch (e) {}
+            },
+
+            async fetchRoomState(pairCode) {
+                if (!pairCode) return null;
+                try {
+                    const res = await fetch(`https://ntfy.sh/${this.getTopic(pairCode)}/json?poll=1&since=72h`, {
+                        cache: 'no-store'
+                    });
+                    if (!res.ok) return null;
+                    const text = await res.text();
+                    const lines = text.trim().split('\n').filter(Boolean);
+                    let latestState = null;
+
+                    for (const line of lines) {
+                        try {
+                            const pkt = JSON.parse(line);
+                            if (pkt.event === 'message' && pkt.message) {
+                                const parsed = JSON.parse(pkt.message);
+                                if (parsed && parsed.pairCode === pairCode) {
+                                    if (!latestState || (parsed.updatedAt || 0) >= (latestState.updatedAt || 0)) {
+                                        latestState = parsed;
+                                    }
+                                }
+                            }
+                        } catch (err) {}
+                    }
+                    return latestState;
+                } catch (e) {
+                    return null;
+                }
+            },
+
+            subscribeRoom(pairCode, onUpdateCallback) {
+                if (this.eventSource) {
+                    this.eventSource.close();
+                    this.eventSource = null;
+                }
+                if (this.pollTimer) {
+                    clearInterval(this.pollTimer);
+                    this.pollTimer = null;
+                }
+                if (!pairCode) return;
+
+                const topic = this.getTopic(pairCode);
+                try {
+                    this.eventSource = new EventSource(`https://ntfy.sh/${topic}/sse`);
+                    this.eventSource.onmessage = (e) => {
+                        try {
+                            const pkt = JSON.parse(e.data);
+                            if (pkt.event === 'message' && pkt.message) {
+                                const incoming = JSON.parse(pkt.message);
+                                if (incoming && incoming.pairCode === pairCode) {
+                                    onUpdateCallback(incoming);
+                                }
+                            }
+                        } catch (err) {}
+                    };
+                } catch (e) {}
+
+                // Дополнительный фоновый опрос каждые 6 секунд на случай блокировки SSE мобильной сетью
+                this.pollTimer = setInterval(async () => {
+                    const remote = await this.fetchRoomState(pairCode);
+                    if (remote) {
+                        onUpdateCallback(remote);
+                    }
+                }, 6000);
+            },
+
+            async saveAccountToCloud(loginKey, accountObj) {
+                if (!loginKey || !accountObj) return;
+                try {
+                    await fetch(`https://ntfy.sh/${this.accountsTopic}_${loginKey.toLowerCase()}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
+                        body: JSON.stringify(accountObj)
+                    });
+                } catch (e) {}
+            },
+
+            async fetchAccountFromCloud(loginKey) {
+                if (!loginKey) return null;
+                try {
+                    const res = await fetch(`https://ntfy.sh/${this.accountsTopic}_${loginKey.toLowerCase()}/json?poll=1&since=720h`, {
+                        cache: 'no-store'
+                    });
+                    if (!res.ok) return null;
+                    const text = await res.text();
+                    const lines = text.trim().split('\n').filter(Boolean);
+                    let latestAcc = null;
+                    for (const line of lines) {
+                        try {
+                            const pkt = JSON.parse(line);
+                            if (pkt.event === 'message' && pkt.message) {
+                                const parsed = JSON.parse(pkt.message);
+                                if (parsed && parsed.login === loginKey.toLowerCase()) {
+                                    latestAcc = parsed;
+                                }
+                            }
+                        } catch (err) {}
+                    }
+                    return latestAcc;
+                } catch (e) {
+                    return null;
+                }
+            }
+        };
 
         const githubCloudEngine = {
             token: EMBEDDED_GITHUB_TOKEN || localStorage.getItem('couple_embedded_gh_token') || '',
@@ -1324,7 +1450,8 @@
                         headers: {
                             'Authorization': `token ${this.token}`,
                             'Accept': 'application/vnd.github.v3+json'
-                        }
+                        },
+                        cache: 'no-store'
                     });
                     if (!res.ok) return null;
                     const data = await res.json();
@@ -1341,7 +1468,8 @@
                 if (!gistId) return;
                 try {
                     const res = await fetch(`https://api.github.com/gists/${gistId}`, {
-                        headers: { 'Authorization': `token ${this.token}` }
+                        headers: { 'Authorization': `token ${this.token}` },
+                        cache: 'no-store'
                     });
                     let accountsMap = {};
                     if (res.ok) {
@@ -1370,7 +1498,8 @@
                 if (!this.isConfigured() || !this.gistId) return null;
                 try {
                     const res = await fetch(`https://api.github.com/gists/${this.gistId}`, {
-                        headers: { 'Authorization': `token ${this.token}` }
+                        headers: { 'Authorization': `token ${this.token}` },
+                        cache: 'no-store'
                     });
                     if (!res.ok) return null;
                     const data = await res.json();
@@ -1387,7 +1516,7 @@
                 if (!this.isConfigured() || !pairCode) return;
                 this.pollTimer = setInterval(async () => {
                     const remote = await this.fetchRoomState(pairCode);
-                    if (remote && (!appState || remote.updatedAt > appState.updatedAt)) {
+                    if (remote) {
                         onUpdateCallback(remote);
                     }
                 }, 7000);
@@ -1606,7 +1735,6 @@
 
         function createDefaultRoomState(creatorUser) {
             const sampleImg = createInitialSampleDrawing();
-            // Добавим пару демонстрационных фото-дней в текущем месяце, чтобы календарь сразу выглядел живым
             const today = new Date();
             const d1 = new Date(today.getFullYear(), today.getMonth(), Math.max(1, today.getDate() - 2));
             const d2 = new Date(today.getFullYear(), today.getMonth(), Math.max(1, today.getDate() - 1));
@@ -1697,12 +1825,63 @@
             };
         }
 
+        // Умное объединение приходящих из облака данных комнаты без потери ни одного из двух партнеров
+        function applyRemoteRoomUpdate(remoteState) {
+            if (!remoteState || !currentUser) return;
+            const prevMembersCount = Object.keys((appState && appState.members) || {}).length;
+            const mergedMembers = {
+                ...((appState && appState.members) || {}),
+                ...(remoteState.members || {})
+            };
+
+            // Гарантируем, что наш собственный профиль всегда присутствует в комнате
+            const myPrev = mergedMembers[currentUser.login] || {};
+            mergedMembers[currentUser.login] = {
+                name: currentUser.name,
+                avatar: currentUser.avatar || myPrev.avatar || '🥰',
+                birthdate: currentUser.birthdate || myPrev.birthdate || '',
+                bio: currentUser.bio || myPrev.bio || '',
+                moodEmoji: myPrev.moodEmoji || '☕',
+                moodText: myPrev.moodText || 'На связи!'
+            };
+
+            const remoteNewer = !appState || (remoteState.updatedAt || 0) >= (appState.updatedAt || 0);
+            const newMembersCount = Object.keys(mergedMembers).length;
+
+            if (remoteNewer || newMembersCount > prevMembersCount) {
+                appState = {
+                    ...(appState || {}),
+                    ...remoteState,
+                    pairCode: currentUser.pairCode,
+                    members: mergedMembers
+                };
+                ensureAppStateIntegrity();
+                saveRoomLocally(false);
+                renderAll();
+
+                // Если в комнате только что появился второй партнер, а на сервере еще не было нашей записи — пушим объединенный список
+                if (!remoteState.members || !remoteState.members[currentUser.login]) {
+                    saveRoomLocally(true);
+                }
+            }
+        }
+
+        async function manualForceSync() {
+            if (!currentUser || !currentUser.pairCode) return;
+            showToast('Проверяем обновления от партнера...');
+            const remote = await instantRelayCloud.fetchRoomState(currentUser.pairCode);
+            if (remote) {
+                applyRemoteRoomUpdate(remote);
+            } else {
+                saveRoomLocally(true);
+            }
+        }
+
         // ============================================================================
         // 3. ИНИЦИАЛИЗАЦИЯ, ВАЛИДАЦИЯ И АВТОРИЗАЦИЯ (ЗАПОМИНАНИЕ НА УСТРОЙСТВЕ)
         // ============================================================================
         window.onload = function () {
             initDrawingCanvas();
-            // Автозаполнение сегодняшней даты в форме планов
             const remDateEl = document.getElementById('reminderDateInput');
             if (remDateEl) remDateEl.value = getTodayDateKey();
             checkActiveSession();
@@ -1712,9 +1891,8 @@
             window.addEventListener('storage', (e) => {
                 if (currentUser && e.key === STORAGE_KEY_ROOMS_PREFIX + currentUser.pairCode && e.newValue) {
                     try {
-                        appState = JSON.parse(e.newValue);
-                        ensureAppStateIntegrity();
-                        renderAll();
+                        const parsed = JSON.parse(e.newValue);
+                        applyRemoteRoomUpdate(parsed);
                     } catch (err) {}
                 }
             });
@@ -1723,12 +1901,7 @@
         window.onCloudBridgeReady = function () {
             if (currentUser && currentUser.pairCode) {
                 window.cloudSyncBridge.subscribeCoupleRoom(currentUser.pairCode, (remoteState) => {
-                    if (remoteState && (!appState || remoteState.updatedAt > appState.updatedAt)) {
-                        appState = remoteState;
-                        ensureAppStateIntegrity();
-                        saveRoomLocally(false);
-                        renderAll();
-                    }
+                    applyRemoteRoomUpdate(remoteState);
                 });
             }
         };
@@ -1872,6 +2045,9 @@
                 if (!existingAcc && githubCloudEngine.isConfigured()) {
                     existingAcc = await githubCloudEngine.fetchAccountFromGitHub(loginKey);
                 }
+                if (!existingAcc) {
+                    existingAcc = await instantRelayCloud.fetchAccountFromCloud(loginKey);
+                }
                 if (existingAcc) {
                     showToast('Такой логин уже занят — переключитесь на «Вход»', 'error');
                     return;
@@ -1891,6 +2067,7 @@
 
                 accountsDB[loginKey] = newAccount;
                 saveLocalAccountsDB(accountsDB);
+                instantRelayCloud.saveAccountToCloud(loginKey, newAccount);
                 if (window.cloudSyncBridge) {
                     await window.cloudSyncBridge.saveUserAccount(loginKey, newAccount);
                 }
@@ -1898,24 +2075,23 @@
                     await githubCloudEngine.saveAccountToGitHub(loginKey, newAccount);
                 }
 
-                loginIntoSession(newAccount);
+                await loginIntoSession(newAccount);
                 showToast(`Аккаунт ${displayName} создан!`);
             } else {
                 // Режим входа
                 let account = accountsDB[loginKey];
                 if (!account && window.cloudSyncBridge && window.cloudSyncBridge.ready) {
                     account = await window.cloudSyncBridge.fetchUserAccount(loginKey);
-                    if (account) {
-                        accountsDB[loginKey] = account;
-                        saveLocalAccountsDB(accountsDB);
-                    }
                 }
                 if (!account && githubCloudEngine.isConfigured()) {
                     account = await githubCloudEngine.fetchAccountFromGitHub(loginKey);
-                    if (account) {
-                        accountsDB[loginKey] = account;
-                        saveLocalAccountsDB(accountsDB);
-                    }
+                }
+                if (!account) {
+                    account = await instantRelayCloud.fetchAccountFromCloud(loginKey);
+                }
+                if (account) {
+                    accountsDB[loginKey] = account;
+                    saveLocalAccountsDB(accountsDB);
                 }
 
                 if (!account) {
@@ -1931,14 +2107,13 @@
                     return;
                 }
 
-                loginIntoSession(account);
+                await loginIntoSession(account);
                 showToast(`С возвращением, ${account.name}!`);
             }
         }
 
         function checkActiveSession() {
             try {
-                // Проверяем сохраненную сессию на устройстве (localStorage или sessionStorage)
                 const savedSession = localStorage.getItem(STORAGE_KEY_SESSION) || sessionStorage.getItem(STORAGE_KEY_SESSION);
                 if (savedSession) {
                     const userObj = JSON.parse(savedSession);
@@ -1949,16 +2124,13 @@
                 }
             } catch (e) {}
 
-            // Если нет активной сессии — показываем экран Входа / Регистрации
             document.getElementById('authScreen').classList.remove('hidden');
         }
 
-        function loginIntoSession(userObj, isAutoRestore = false) {
-            // Загружаем актуальные данные из локальной базы аккаунтов, если есть
+        async function loginIntoSession(userObj, isAutoRestore = false) {
             const accountsDB = getLocalAccountsDB();
             const fullUser = accountsDB[userObj.login] ? { ...accountsDB[userObj.login], ...userObj } : userObj;
 
-            // Если со старой версии остался короткий код, обновляем до 10-значного
             if (!fullUser.pairCode || !PAIR_CODE_REGEX.test(fullUser.pairCode)) {
                 fullUser.pairCode = generatePairCode();
             }
@@ -1982,34 +2154,36 @@
 
             document.getElementById('authScreen').classList.add('hidden');
 
-            loadOrCreateCoupleRoom(currentUser.pairCode);
+            // Сначала загружаем локальный кэш для мгновенного отклика интерфейса
+            loadOrCreateCoupleRoom(currentUser.pairCode, false);
+            renderAll();
+
+            // Подписываемся на автоматическое облако реального времени (работает без токенов!)
+            instantRelayCloud.subscribeRoom(currentUser.pairCode, (remoteState) => {
+                applyRemoteRoomUpdate(remoteState);
+            });
+
+            // Проверяем, есть ли уже комната в облаке (например, созданная партнером)
+            const cloudRoom = await instantRelayCloud.fetchRoomState(currentUser.pairCode);
+            if (cloudRoom) {
+                applyRemoteRoomUpdate(cloudRoom);
+            } else {
+                saveRoomLocally(true);
+            }
+
             if (window.cloudSyncBridge && window.cloudSyncBridge.ready) {
                 window.cloudSyncBridge.subscribeCoupleRoom(currentUser.pairCode, (remoteState) => {
-                    if (remoteState && (!appState || remoteState.updatedAt > appState.updatedAt)) {
-                        appState = remoteState;
-                        ensureAppStateIntegrity();
-                        saveRoomLocally(false);
-                        renderAll();
-                    }
+                    applyRemoteRoomUpdate(remoteState);
                 });
             }
             if (githubCloudEngine.isConfigured()) {
                 githubCloudEngine.fetchRoomState(currentUser.pairCode).then(remoteState => {
-                    if (remoteState && (!appState || remoteState.updatedAt > appState.updatedAt)) {
-                        appState = remoteState;
-                        ensureAppStateIntegrity();
-                        saveRoomLocally(false);
-                        renderAll();
-                    }
+                    if (remoteState) applyRemoteRoomUpdate(remoteState);
                 });
                 githubCloudEngine.startPollingRoom(currentUser.pairCode, (remoteState) => {
-                    appState = remoteState;
-                    ensureAppStateIntegrity();
-                    saveRoomLocally(false);
-                    renderAll();
+                    applyRemoteRoomUpdate(remoteState);
                 });
             }
-            renderAll();
         }
 
         function logoutUser() {
@@ -2021,7 +2195,7 @@
             showToast('Вы вышли из аккаунта');
         }
 
-        function loadOrCreateCoupleRoom(pairCode) {
+        function loadOrCreateCoupleRoom(pairCode, pushImmediately = true) {
             const roomKey = STORAGE_KEY_ROOMS_PREFIX + pairCode;
             try {
                 const existing = localStorage.getItem(roomKey);
@@ -2034,6 +2208,7 @@
                 appState = createDefaultRoomState(currentUser);
             }
 
+            appState.pairCode = pairCode;
             ensureAppStateIntegrity();
 
             // Регистрируем или обновляем текущего пользователя в комнате пары
@@ -2055,7 +2230,7 @@
                 }
             }
 
-            saveRoomLocally(true);
+            saveRoomLocally(pushImmediately);
         }
 
         function ensureAppStateIntegrity() {
@@ -2087,18 +2262,24 @@
 
         function saveRoomLocally(pushCloud = true) {
             if (!currentUser || !appState) return;
-            appState.updatedAt = Date.now();
+            appState.pairCode = currentUser.pairCode;
+            if (pushCloud) {
+                appState.updatedAt = Date.now();
+            }
             const roomKey = STORAGE_KEY_ROOMS_PREFIX + currentUser.pairCode;
             try {
                 localStorage.setItem(roomKey, JSON.stringify(appState));
             } catch (e) {
                 showToast('Память заполнена, очистите старые снимки', 'error');
             }
-            if (pushCloud && window.cloudSyncBridge) {
-                window.cloudSyncBridge.pushCoupleRoom(currentUser.pairCode, appState);
-            }
-            if (pushCloud && githubCloudEngine.isConfigured()) {
-                githubCloudEngine.pushRoomState(currentUser.pairCode, appState);
+            if (pushCloud) {
+                instantRelayCloud.pushRoomState(currentUser.pairCode, appState);
+                if (window.cloudSyncBridge) {
+                    window.cloudSyncBridge.pushCoupleRoom(currentUser.pairCode, appState);
+                }
+                if (githubCloudEngine.isConfigured()) {
+                    githubCloudEngine.pushRoomState(currentUser.pairCode, appState);
+                }
             }
         }
 
@@ -2335,7 +2516,6 @@
                     filledDaysCount++;
                     monthEntries.push({ dateKey, day, ...entry });
                     const drawingsCount = Array.isArray(entry.drawingsHistory) ? entry.drawingsHistory.length : 0;
-                    // Ячейка заполнена фотографией вместо обычной даты!
                     cell.className = `relative aspect-square rounded-2xl overflow-hidden group shadow-sm border-2 ${isToday ? 'border-warm-500 ring-2 ring-warm-200' : 'border-white'} transition transform hover:scale-105 active:scale-95`;
                     cell.innerHTML = `
                         <img src="${entry.imageData}" alt="${dateKey}" class="w-full h-full object-cover">
@@ -2345,7 +2525,6 @@
                         ${entry.caption ? '<span class="absolute bottom-1 right-1 w-2 h-2 rounded-full bg-warm-500 ring-2 ring-white" title="Есть подпись дня"></span>' : ''}
                     `;
                 } else {
-                    // День пока без фотографии
                     cell.className = `relative aspect-square rounded-2xl flex flex-col items-center justify-center border transition active:scale-95 ${
                         isToday
                             ? 'bg-warm-50 border-warm-500 text-warm-600 font-extrabold shadow-sm'
@@ -2363,7 +2542,6 @@
             document.getElementById('calendarStatsText').textContent =
                 `Фотографий в этом месяце: ${filledDaysCount} из ${daysInMonth}`;
 
-            // Рендерим список подписанных дней под календарем
             const storiesList = document.getElementById('calendarMonthStoriesList');
             storiesList.innerHTML = '';
 
@@ -2393,7 +2571,6 @@
                 });
             }
 
-            // Рендерим историю рисунков по дням календаря
             renderCalendarDrawingsHistory();
         }
 
@@ -2414,7 +2591,6 @@
                     }
                 });
 
-            // Добавим также рисунки из locketFeed, если они еще не попали в массив
             (appState.locketFeed || []).forEach(item => {
                 if (item.type === 'draw') {
                     const dk = item.dateKey || getTodayDateKey();
@@ -2500,7 +2676,6 @@
                 deleteBtn.classList.add('hidden');
             }
 
-            // Показываем историю рисунков и фото за этот конкретный день
             const dayHistory = (entry && Array.isArray(entry.drawingsHistory)) ? entry.drawingsHistory : [];
             if (dayHistory.length > 0) {
                 drawingsSection.classList.remove('hidden');
@@ -2634,7 +2809,6 @@
             if (!container) return;
             container.innerHTML = '';
 
-            // Собираем фото дней из календаря
             const dailyItems = Object.keys(appState.dailyPhotos || {})
                 .sort((a, b) => b.localeCompare(a))
                 .map(dateKey => {
@@ -2715,7 +2889,6 @@
             if (appState.reminders.length === 0) {
                 remList.innerHTML = `<p class="text-xs text-slate-400 py-2 text-center">Список планов и напоминаний пуст</p>`;
             } else {
-                // Сортируем: невыполненные сверху, затем по дате и времени
                 const sortedRems = [...appState.reminders].sort((a, b) => {
                     if (a.done !== b.done) return a.done ? 1 : -1;
                     const dtA = `${a.date || '9999-99-99'} ${a.time || '23:59'}`;
@@ -2813,7 +2986,6 @@
             optionalContainer.innerHTML = '';
             chainsContainer.innerHTML = '';
 
-            // 1. Рендерим все облачка продуктов в кладовой
             appState.foodProducts.forEach(prod => {
                 const isStock = Boolean(prod.inStock);
                 const isEssential = prod.priority !== 'optional';
@@ -2845,7 +3017,6 @@
                 pantryContainer.appendChild(cloud);
             });
 
-            // 2. Список покупок (те продукты, которых нет дома)
             const needToBuy = appState.foodProducts.filter(p => !p.inStock);
             const essentialList = needToBuy.filter(p => p.priority !== 'optional');
             const optionalList = needToBuy.filter(p => p.priority === 'optional');
@@ -2880,7 +3051,6 @@
                 });
             }
 
-            // 3. Рендерим цепочки блюд
             if (appState.dishChains.length === 0) {
                 chainsContainer.innerHTML = `
                     <div class="bg-white rounded-3xl p-6 text-center border border-slate-100 text-xs text-slate-400">
@@ -3144,7 +3314,6 @@
             document.getElementById('profileDisplayName').textContent = me.name;
             document.getElementById('profileLoginHandle').textContent = `@${currentUser.login}`;
 
-            // Заполняем поля Личного кабинета, если пользователь сейчас не печатает в них
             const nameInp = document.getElementById('myDisplayNameInput');
             const bdayInp = document.getElementById('myBirthdateInput');
             const bioInp = document.getElementById('myBioInput');
@@ -3162,7 +3331,6 @@
                 ageBadge.textContent = '';
             }
 
-            // Бейдж статуса соединения и карточка партнера
             const connBadge = document.getElementById('pairConnectionBadge');
             const partnerCard = document.getElementById('partnerProfileCard');
 
@@ -3193,14 +3361,11 @@
             const ghBadge = document.getElementById('githubCloudStatusBadge');
             if (ghBadge) {
                 if (githubCloudEngine.isConfigured()) {
-                    ghBadge.textContent = 'GitHub Cloud активен';
-                    ghBadge.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200';
-                } else if (window.cloudSyncBridge && window.cloudSyncBridge.ready) {
-                    ghBadge.textContent = 'Облако активно';
+                    ghBadge.textContent = 'GitHub + Облако активны';
                     ghBadge.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200';
                 } else {
-                    ghBadge.textContent = 'Локальный режим';
-                    ghBadge.className = 'text-[10px] font-semibold px-2 py-0.5 rounded-full bg-slate-200 text-slate-600';
+                    ghBadge.textContent = 'Авто-Облако активно';
+                    ghBadge.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200';
                 }
             }
         }
@@ -3210,13 +3375,19 @@
             const freshCode = generatePairCode();
             currentUser.pairCode = freshCode;
             persistCurrentUserProfile();
-            loadOrCreateCoupleRoom(freshCode);
+            loadOrCreateCoupleRoom(freshCode, true);
+            instantRelayCloud.subscribeRoom(freshCode, (remoteState) => {
+                applyRemoteRoomUpdate(remoteState);
+            });
             renderAll();
             showToast(`Сгенерирован новый 10-значный код: ${freshCode}`);
         }
 
         function copyMyPairCode() {
             if (!currentUser) return;
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(currentUser.pairCode).catch(() => {});
+            }
             const temp = document.createElement('input');
             temp.value = currentUser.pairCode;
             document.body.appendChild(temp);
@@ -3251,6 +3422,7 @@
                     pairCode: currentUser.pairCode
                 };
                 saveLocalAccountsDB(accountsDB);
+                instantRelayCloud.saveAccountToCloud(currentUser.login, accountsDB[currentUser.login]);
                 if (window.cloudSyncBridge) {
                     window.cloudSyncBridge.saveUserAccount(currentUser.login, accountsDB[currentUser.login]);
                 }
@@ -3289,57 +3461,85 @@
             saveAndSync('Личный профиль сохранен!');
         }
 
-        function linkWithPartnerCode() {
+        // ИСПРАВЛЕННАЯ ФУНКЦИЯ СВЯЗИ ДВУХ ТЕЛЕФОНОВ:
+        // Сначала скачивает комнату партнера из облака, добавляет второй телефон в members и синхронизирует обоих!
+        async function linkWithPartnerCode() {
             const codeInput = document.getElementById('enterPartnerCodeInput');
+            const submitBtn = document.getElementById('linkPartnerSubmitBtn');
             const newCode = codeInput.value.trim().toUpperCase();
             if (!PAIR_CODE_REGEX.test(newCode)) {
                 showToast('Код комнаты должен состоять ровно из 10 латинских букв и цифр!', 'error');
                 return;
             }
 
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<span>Связываем...</span>';
+            }
+
             currentUser.pairCode = newCode;
             persistCurrentUserProfile();
 
-            loadOrCreateCoupleRoom(newCode);
+            // 1. Пытаемся сначала забрать существующую комнату партнера из облака (чтобы НЕ затереть её!)
+            let remoteRoom = await instantRelayCloud.fetchRoomState(newCode);
+            if (!remoteRoom && githubCloudEngine.isConfigured()) {
+                remoteRoom = await githubCloudEngine.fetchRoomState(newCode);
+            }
+
+            if (remoteRoom) {
+                appState = remoteRoom;
+                ensureAppStateIntegrity();
+            } else {
+                loadOrCreateCoupleRoom(newCode, false);
+            }
+
+            // 2. Регистрируем себя в списке участников этой комнаты
+            appState.pairCode = newCode;
             appState.partnerLinkedManually = true;
+            if (!appState.members) appState.members = {};
+            appState.members[currentUser.login] = {
+                name: currentUser.name,
+                avatar: currentUser.avatar || '🥰',
+                birthdate: currentUser.birthdate || '',
+                bio: currentUser.bio || '',
+                moodEmoji: '💖',
+                moodText: 'Мы на связи!'
+            };
+
             if (appState.fallbackPartner && appState.fallbackPartner.name === 'Партнер не подключен') {
                 appState.fallbackPartner.name = 'Вторая половинка';
                 appState.fallbackPartner.avatar = '💖';
                 appState.fallbackPartner.moodEmoji = '💖';
                 appState.fallbackPartner.moodText = 'Люблю тебя!';
             }
+
+            // 3. Сохраняем и отправляем объединенную комнату обратно в облако (первый телефон тут же увидит подключение!)
             saveRoomLocally(true);
 
+            // 4. Подписываемся на живые обновления этой комнаты
+            instantRelayCloud.subscribeRoom(newCode, (incomingState) => {
+                applyRemoteRoomUpdate(incomingState);
+            });
+
             if (window.cloudSyncBridge && window.cloudSyncBridge.ready) {
-                window.cloudSyncBridge.subscribeCoupleRoom(newCode, (remoteState) => {
-                    if (remoteState) {
-                        appState = remoteState;
-                        ensureAppStateIntegrity();
-                        saveRoomLocally(false);
-                        renderAll();
-                    }
+                window.cloudSyncBridge.subscribeCoupleRoom(newCode, (incomingState) => {
+                    applyRemoteRoomUpdate(incomingState);
                 });
             }
             if (githubCloudEngine.isConfigured()) {
-                githubCloudEngine.fetchRoomState(newCode).then(remoteState => {
-                    if (remoteState) {
-                        appState = remoteState;
-                        ensureAppStateIntegrity();
-                        saveRoomLocally(false);
-                        renderAll();
-                    }
+                githubCloudEngine.startPollingRoom(newCode, (incomingState) => {
+                    applyRemoteRoomUpdate(incomingState);
                 });
-                githubCloudEngine.startPollingRoom(newCode, (remoteState) => {
-                    appState = remoteState;
-                    ensureAppStateIntegrity();
-                    saveRoomLocally(false);
-                    renderAll();
-                });
+            }
+
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i data-lucide="link" class="w-3.5 h-3.5"></i><span>Связать</span>';
             }
 
             codeInput.value = '';
             renderAll();
-            showToast('Пара успешно связана! Счетчик дней активирован ❤️');
+            showToast('Пара успешно связана! Оба телефона синхронизированы ❤️');
         }
 
         let devTapCounter = 0;
@@ -3540,7 +3740,7 @@
             const sy = ((video.videoHeight || 480) - size) / 2;
             ctx.drawImage(video, sx, sy, size, size, 0, 0, 480, 480);
 
-            pendingPhotoDataUrl = c.toDataURL('image/jpeg', 0.78);
+            pendingPhotoDataUrl = c.toDataURL('image/jpeg', 0.72);
             stopLiveCamera();
             showCapturedPhotoPreview(pendingPhotoDataUrl);
         }
@@ -3576,14 +3776,14 @@
                 const img = new Image();
                 img.onload = function () {
                     const canvas = document.createElement('canvas');
-                    canvas.width = 480;
-                    canvas.height = 480;
+                    canvas.width = 400;
+                    canvas.height = 400;
                     const ctx = canvas.getContext('2d');
                     const size = Math.min(img.width, img.height);
                     const sx = (img.width - size) / 2;
                     const sy = (img.height - size) / 2;
-                    ctx.drawImage(img, sx, sy, size, size, 0, 0, 480, 480);
-                    callback(canvas.toDataURL('image/jpeg', 0.78));
+                    ctx.drawImage(img, sx, sy, size, size, 0, 0, 400, 400);
+                    callback(canvas.toDataURL('image/jpeg', 0.72));
                 };
                 img.src = e.target.result;
             };
@@ -3595,7 +3795,7 @@
 
             if (currentCreatorMode === 'draw') {
                 const canvas = document.getElementById('drawingCanvas');
-                finalImageData = canvas.toDataURL('image/jpeg', 0.82);
+                finalImageData = canvas.toDataURL('image/jpeg', 0.78);
             } else {
                 if (!pendingPhotoDataUrl) {
                     showToast('Сначала сделайте снимок или выберите фотографию', 'error');
@@ -3623,7 +3823,6 @@
             appState.locketFeed.unshift(newItem);
             if (appState.locketFeed.length > 15) appState.locketFeed.pop();
 
-            // Сохраняем в календарь сегодняшнего дня + добавляем в историю рисунков/фото этого дня
             const existingDay = appState.dailyPhotos[todayKey] || {
                 imageData: finalImageData,
                 caption: captionText,
@@ -3642,7 +3841,6 @@
                 author: getMyName(),
                 time: nowStr
             });
-            // Обновляем главную обложку дня, если отправлено фото или если обложки еще не было
             if (currentCreatorMode === 'photo' || !existingDay.imageData) {
                 existingDay.imageData = finalImageData;
                 existingDay.caption = captionText;
