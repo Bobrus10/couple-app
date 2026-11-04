@@ -15,6 +15,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- PeerJS: Прямая P2P связь между двумя телефонами без серверов и CORS -->
+    <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -248,7 +250,7 @@
                             <div class="text-xs font-medium text-slate-700 truncate" id="partnerMoodText">Скучаю по тебе!</div>
                         </div>
                     </div>
-                    <button onclick="manualForceSync()" title="Обновить синхронизацию" class="p-1 text-slate-400 hover:text-brand-600 active:rotate-180 transition shrink-0">
+                    <button onclick="manualForceSync()" title="Обновить синхронизацию с партнером" class="p-1 text-slate-400 hover:text-brand-600 active:rotate-180 transition shrink-0">
                         <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
                     </button>
                 </div>
@@ -845,24 +847,41 @@
                         </div>
                     </div>
 
-                    <!-- Блок архитектуры безопасности БД -->
-                    <div class="bg-slate-50 rounded-2xl p-3.5 border border-slate-200/70 space-y-1.5">
+                    <!-- Блок настройки Облака без правки кода (прямо из приложения) -->
+                    <div class="bg-slate-50 rounded-2xl p-3.5 border border-slate-200/70 space-y-2.5">
                         <div class="flex items-center justify-between">
-                            <button type="button" onclick="handleDevCloudTap()" class="flex items-center gap-2 text-xs font-bold text-slate-800 text-left">
-                                <i data-lucide="lock" class="w-3.5 h-3.5 text-emerald-600"></i>
-                                <span>Конфиденциальность и облако</span>
-                            </button>
-                            <span id="githubCloudStatusBadge" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">Облако активно</span>
+                            <div class="flex items-center gap-2 text-xs font-bold text-slate-800">
+                                <i data-lucide="cloud" class="w-4 h-4 text-brand-500"></i>
+                                <span>Облачная база пары (24/7)</span>
+                            </div>
+                            <span id="githubCloudStatusBadge" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">P2P Мост активен</span>
                         </div>
                         <p class="text-[11px] text-slate-500 leading-relaxed">
-                            Пароли хранятся в виде хеша <code class="bg-white px-1 py-0.5 rounded border text-[10px]">SHA-256</code>. Синхронизация между телефонами работает автоматически по 10-значному коду пары.
+                            Когда оба телефона открыты одновременно, они связываются автоматически через прямой P2P-мост. Чтобы синхронизация работала даже когда один телефон выключен, вставьте ссылку вашей бесплатной базы Firebase ниже (один раз):
                         </p>
-                        <!-- Скрытая панель быстрой привязки GitHub Токена (открывается по 5 кликам на заголовок выше) -->
-                        <div id="devGithubSetupBox" class="hidden pt-2 mt-2 border-t border-slate-200 space-y-2">
-                            <p class="text-[10px] font-bold text-brand-600 uppercase">Дополнительная привязка GitHub Gist (по желанию):</p>
+                        <div class="space-y-2 pt-1">
+                            <input id="cabinetFirebaseUrlInput" type="url" placeholder="https://ваш-проект-default-rtdb.firebaseio.com" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-brand-500">
+                            <div class="flex gap-2">
+                                <button type="button" onclick="saveFirebaseUrlFromCabinet()" class="flex-1 bg-brand-500 hover:bg-brand-600 text-white py-2 rounded-xl text-xs font-semibold transition">
+                                    Подключить облако Firebase
+                                </button>
+                                <button type="button" onclick="manualForceSync()" class="px-3 py-2 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 rounded-xl text-xs font-semibold transition" title="Принудительно синхронизировать">
+                                    🔄
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Дополнительная скрытая панель GitHub Gist (по 5 кликам) -->
+                        <div class="pt-1 border-t border-slate-200/60 flex items-center justify-between">
+                            <button type="button" onclick="handleDevCloudTap()" class="text-[10px] text-slate-400 hover:text-slate-600">
+                                Дополнительно: GitHub Gist API
+                            </button>
+                            <span class="text-[10px] text-slate-400">SHA-256 защита</span>
+                        </div>
+                        <div id="devGithubSetupBox" class="hidden pt-2 space-y-2">
                             <input id="devGhTokenInput" type="password" placeholder="Вставьте GitHub Token (ghp_...)" class="w-full bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 text-xs">
-                            <input id="devGhGistInput" type="text" placeholder="Gist ID (необязательно — создастся сам)" class="w-full bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 text-xs">
-                            <button type="button" onclick="saveDevGithubConfig()" class="w-full bg-slate-900 text-white py-1.5 rounded-xl text-xs font-semibold">Сохранить облако на устройстве</button>
+                            <input id="devGhGistInput" type="text" placeholder="Gist ID (создастся сам)" class="w-full bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 text-xs">
+                            <button type="button" onclick="saveDevGithubConfig()" class="w-full bg-slate-900 text-white py-1.5 rounded-xl text-xs font-semibold">Сохранить GitHub Gist</button>
                         </div>
                     </div>
                 </div>
@@ -1196,7 +1215,7 @@
                     this.ready = true;
                     if (window.onCloudBridgeReady) window.onCloudBridgeReady();
                 } catch (e) {
-                    console.warn('Используется встроенное облако синхронизации:', e);
+                    console.warn('Используется локальное хранилище синхронизации:', e);
                 }
             },
 
@@ -1249,136 +1268,250 @@
 
     <script>
         // ============================================================================
-        // 1. БЕСПЛАТНЫЙ АВТОМАТИЧЕСКИЙ ОБЛАЧНЫЙ СЕРВЕР (РАБОТАЕТ СРАЗУ БЕЗ ТОКЕНОВ!)
-        // + ПОДДЕРЖКА GITHUB GIST ПО ЖЕЛАНИЮ
+        // 1. ДВОЙНОЙ ДВИЖОК СИНХРОНИЗАЦИИ БЕЗ ПРАВКИ КОДА:
+        //    - WebRTC PeerJS (соединяет 2 открытых телефона напрямую без серверов)
+        //    - Firebase Realtime Database REST (хранит данные 24/7 по ссылке из Кабинета)
+        //    - GitHub Gist (опционально)
         // ============================================================================
+        const EMBEDDED_FIREBASE_DB_URL = '';
         const EMBEDDED_GITHUB_TOKEN = '';
         const EMBEDDED_MASTER_GIST_ID = '';
 
-        // Мгновенный облачный движок для связи двух телефонов по 10-значному коду без настройки токенов
         const instantRelayCloud = {
-            prefix: 'couple_space_v3_room_',
-            accountsTopic: 'couple_space_v3_accounts_global_idx',
-            eventSource: null,
+            dbUrl: EMBEDDED_FIREBASE_DB_URL || localStorage.getItem('couple_firebase_db_url') || '',
+            peer: null,
+            activeConns: [],
+            currentRoomCode: null,
+            onUpdateCallback: null,
+            reconnectTimer: null,
             pollTimer: null,
 
-            getTopic(pairCode) {
-                return this.prefix + String(pairCode || '').trim().toUpperCase();
+            hasFirebaseUrl() {
+                const u = (this.dbUrl || '').trim();
+                return u.startsWith('https://') && (u.includes('firebaseio.com') || u.includes('firebasedatabase.app'));
+            },
+
+            cleanDbUrl() {
+                return (this.dbUrl || '').trim().replace(/\/+$/, '');
+            },
+
+            setFirebaseUrl(url) {
+                let clean = (url || '').trim().replace(/\/+$/, '');
+                const match = clean.match(/^https:\/\/[a-zA-Z0-9-]+\.(firebaseio\.com|[\w-]+\.firebasedatabase\.app)/);
+                if (match) clean = match[0];
+                this.dbUrl = clean;
+                if (clean) {
+                    localStorage.setItem('couple_firebase_db_url', clean);
+                } else {
+                    localStorage.removeItem('couple_firebase_db_url');
+                }
+            },
+
+            initPeerBridge(pairCode, onUpdateCallback) {
+                const code = String(pairCode || '').trim().toUpperCase();
+                if (!code) return;
+
+                this.currentRoomCode = code;
+                if (onUpdateCallback) this.onUpdateCallback = onUpdateCallback;
+
+                if (typeof Peer === 'undefined') return;
+
+                if (this.peer) {
+                    try { this.peer.destroy(); } catch (e) {}
+                    this.peer = null;
+                }
+                this.activeConns = [];
+                if (this.reconnectTimer) clearInterval(this.reconnectTimer);
+
+                const hostId = `couple-space-v6-${code}-peer1`;
+                const guestId = `couple-space-v6-${code}-peer2`;
+
+                const startPeerSession = (myPeerId, partnerPeerId) => {
+                    try {
+                        const p = new Peer(myPeerId, { debug: 0 });
+                        this.peer = p;
+
+                        p.on('open', () => {
+                            this.connectToPartnerPeer(partnerPeerId);
+                            renderSyncTabState();
+                        });
+
+                        p.on('connection', (conn) => {
+                            this.setupPeerConnection(conn);
+                        });
+
+                        p.on('error', (err) => {
+                            if (err && err.type === 'unavailable-id' && myPeerId === hostId) {
+                                try { p.destroy(); } catch (e) {}
+                                startPeerSession(guestId, hostId);
+                            }
+                        });
+                    } catch (e) {}
+                };
+
+                startPeerSession(hostId, guestId);
+
+                this.reconnectTimer = setInterval(() => {
+                    if (!this.peer || this.peer.destroyed) return;
+                    const openList = this.activeConns.filter(c => c && c.open);
+                    if (openList.length === 0) {
+                        const target = this.peer.id === hostId ? guestId : hostId;
+                        this.connectToPartnerPeer(target);
+                    }
+                }, 4500);
+            },
+
+            connectToPartnerPeer(targetId) {
+                if (!this.peer || !this.peer.open) return;
+                if (this.activeConns.some(c => c.peer === targetId && c.open)) return;
+                try {
+                    const conn = this.peer.connect(targetId, { reliable: true });
+                    this.setupPeerConnection(conn);
+                } catch (e) {}
+            },
+
+            setupPeerConnection(conn) {
+                if (!conn) return;
+                conn.on('open', () => {
+                    this.activeConns = this.activeConns.filter(c => c.peer !== conn.peer);
+                    this.activeConns.push(conn);
+                    renderSyncTabState();
+
+                    if (typeof appState !== 'undefined' && appState) {
+                        conn.send({
+                            type: 'FULL_SYNC',
+                            pairCode: this.currentRoomCode,
+                            firebaseUrl: this.cleanDbUrl(),
+                            state: appState
+                        });
+                    }
+                });
+
+                conn.on('data', (packet) => {
+                    if (!packet || packet.type !== 'FULL_SYNC' || !packet.state) return;
+
+                    if (packet.firebaseUrl && !this.hasFirebaseUrl()) {
+                        this.setFirebaseUrl(packet.firebaseUrl);
+                    }
+
+                    const wasConnected = typeof isPartnerConnected === 'function' ? isPartnerConnected() : false;
+                    if (this.onUpdateCallback) {
+                        this.onUpdateCallback(packet.state);
+                    }
+                    const nowConnected = typeof isPartnerConnected === 'function' ? isPartnerConnected() : false;
+
+                    if (!wasConnected && nowConnected && typeof appState !== 'undefined' && conn.open) {
+                        setTimeout(() => {
+                            try {
+                                conn.send({
+                                    type: 'FULL_SYNC',
+                                    pairCode: this.currentRoomCode,
+                                    firebaseUrl: this.cleanDbUrl(),
+                                    state: appState
+                                });
+                            } catch (e) {}
+                        }, 250);
+                    }
+                });
+
+                conn.on('close', () => {
+                    this.activeConns = this.activeConns.filter(c => c !== conn);
+                    renderSyncTabState();
+                });
             },
 
             async pushRoomState(pairCode, stateObj) {
                 if (!pairCode || !stateObj) return;
-                try {
-                    await fetch(`https://ntfy.sh/${this.getTopic(pairCode)}`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
-                        body: JSON.stringify(stateObj)
-                    });
-                } catch (e) {}
+                const cleanCode = String(pairCode).trim().toUpperCase();
+
+                if (this.hasFirebaseUrl()) {
+                    stateObj.sharedFirebaseUrl = this.cleanDbUrl();
+                }
+
+                this.activeConns.forEach(conn => {
+                    if (conn && conn.open) {
+                        try {
+                            conn.send({
+                                type: 'FULL_SYNC',
+                                pairCode: cleanCode,
+                                firebaseUrl: this.cleanDbUrl(),
+                                state: stateObj
+                            });
+                        } catch (e) {}
+                    }
+                });
+
+                if (this.hasFirebaseUrl()) {
+                    try {
+                        await fetch(`${this.cleanDbUrl()}/couple_rooms/${cleanCode}.json`, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(stateObj)
+                        });
+                    } catch (e) {}
+                }
             },
 
             async fetchRoomState(pairCode) {
                 if (!pairCode) return null;
-                try {
-                    const res = await fetch(`https://ntfy.sh/${this.getTopic(pairCode)}/json?poll=1&since=72h`, {
-                        cache: 'no-store'
-                    });
-                    if (!res.ok) return null;
-                    const text = await res.text();
-                    const lines = text.trim().split('\n').filter(Boolean);
-                    let latestState = null;
+                const cleanCode = String(pairCode).trim().toUpperCase();
 
-                    for (const line of lines) {
-                        try {
-                            const pkt = JSON.parse(line);
-                            if (pkt.event === 'message' && pkt.message) {
-                                const parsed = JSON.parse(pkt.message);
-                                if (parsed && parsed.pairCode === pairCode) {
-                                    if (!latestState || (parsed.updatedAt || 0) >= (latestState.updatedAt || 0)) {
-                                        latestState = parsed;
-                                    }
-                                }
+                if (this.hasFirebaseUrl()) {
+                    try {
+                        const res = await fetch(`${this.cleanDbUrl()}/couple_rooms/${cleanCode}.json`, {
+                            cache: 'no-store'
+                        });
+                        if (res.ok) {
+                            const data = await res.json();
+                            if (data && typeof data === 'object') {
+                                return data;
                             }
-                        } catch (err) {}
-                    }
-                    return latestState;
-                } catch (e) {
-                    return null;
+                        }
+                    } catch (e) {}
                 }
+                return null;
             },
 
             subscribeRoom(pairCode, onUpdateCallback) {
-                if (this.eventSource) {
-                    this.eventSource.close();
-                    this.eventSource = null;
-                }
-                if (this.pollTimer) {
-                    clearInterval(this.pollTimer);
-                    this.pollTimer = null;
-                }
-                if (!pairCode) return;
+                const cleanCode = String(pairCode || '').trim().toUpperCase();
+                if (!cleanCode) return;
 
-                const topic = this.getTopic(pairCode);
-                try {
-                    this.eventSource = new EventSource(`https://ntfy.sh/${topic}/sse`);
-                    this.eventSource.onmessage = (e) => {
-                        try {
-                            const pkt = JSON.parse(e.data);
-                            if (pkt.event === 'message' && pkt.message) {
-                                const incoming = JSON.parse(pkt.message);
-                                if (incoming && incoming.pairCode === pairCode) {
-                                    onUpdateCallback(incoming);
-                                }
-                            }
-                        } catch (err) {}
-                    };
-                } catch (e) {}
+                this.onUpdateCallback = onUpdateCallback;
+                this.initPeerBridge(cleanCode, onUpdateCallback);
 
-                // Дополнительный фоновый опрос каждые 6 секунд на случай блокировки SSE мобильной сетью
+                if (this.pollTimer) clearInterval(this.pollTimer);
                 this.pollTimer = setInterval(async () => {
-                    const remote = await this.fetchRoomState(pairCode);
-                    if (remote) {
-                        onUpdateCallback(remote);
+                    if (this.hasFirebaseUrl()) {
+                        const remote = await this.fetchRoomState(cleanCode);
+                        if (remote && this.onUpdateCallback) {
+                            this.onUpdateCallback(remote);
+                        }
                     }
-                }, 6000);
+                }, 4500);
             },
 
             async saveAccountToCloud(loginKey, accountObj) {
-                if (!loginKey || !accountObj) return;
+                if (!this.hasFirebaseUrl() || !loginKey || !accountObj) return;
                 try {
-                    await fetch(`https://ntfy.sh/${this.accountsTopic}_${loginKey.toLowerCase()}`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
+                    await fetch(`${this.cleanDbUrl()}/accounts/${loginKey.toLowerCase()}.json`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(accountObj)
                     });
                 } catch (e) {}
             },
 
             async fetchAccountFromCloud(loginKey) {
-                if (!loginKey) return null;
+                if (!this.hasFirebaseUrl() || !loginKey) return null;
                 try {
-                    const res = await fetch(`https://ntfy.sh/${this.accountsTopic}_${loginKey.toLowerCase()}/json?poll=1&since=720h`, {
+                    const res = await fetch(`${this.cleanDbUrl()}/accounts/${loginKey.toLowerCase()}.json`, {
                         cache: 'no-store'
                     });
-                    if (!res.ok) return null;
-                    const text = await res.text();
-                    const lines = text.trim().split('\n').filter(Boolean);
-                    let latestAcc = null;
-                    for (const line of lines) {
-                        try {
-                            const pkt = JSON.parse(line);
-                            if (pkt.event === 'message' && pkt.message) {
-                                const parsed = JSON.parse(pkt.message);
-                                if (parsed && parsed.login === loginKey.toLowerCase()) {
-                                    latestAcc = parsed;
-                                }
-                            }
-                        } catch (err) {}
+                    if (res.ok) {
+                        return await res.json();
                     }
-                    return latestAcc;
-                } catch (e) {
-                    return null;
-                }
+                } catch (e) {}
+                return null;
             }
         };
 
@@ -1450,8 +1583,7 @@
                         headers: {
                             'Authorization': `token ${this.token}`,
                             'Accept': 'application/vnd.github.v3+json'
-                        },
-                        cache: 'no-store'
+                        }
                     });
                     if (!res.ok) return null;
                     const data = await res.json();
@@ -1468,8 +1600,7 @@
                 if (!gistId) return;
                 try {
                     const res = await fetch(`https://api.github.com/gists/${gistId}`, {
-                        headers: { 'Authorization': `token ${this.token}` },
-                        cache: 'no-store'
+                        headers: { 'Authorization': `token ${this.token}` }
                     });
                     let accountsMap = {};
                     if (res.ok) {
@@ -1498,8 +1629,7 @@
                 if (!this.isConfigured() || !this.gistId) return null;
                 try {
                     const res = await fetch(`https://api.github.com/gists/${this.gistId}`, {
-                        headers: { 'Authorization': `token ${this.token}` },
-                        cache: 'no-store'
+                        headers: { 'Authorization': `token ${this.token}` }
                     });
                     if (!res.ok) return null;
                     const data = await res.json();
@@ -1516,7 +1646,7 @@
                 if (!this.isConfigured() || !pairCode) return;
                 this.pollTimer = setInterval(async () => {
                     const remote = await this.fetchRoomState(pairCode);
-                    if (remote) {
+                    if (remote && (!appState || remote.updatedAt > appState.updatedAt)) {
                         onUpdateCallback(remote);
                     }
                 }, 7000);
@@ -1530,12 +1660,10 @@
         const STORAGE_KEY_SESSION = 'couple_space_active_session_v3';
         const STORAGE_KEY_ROOMS_PREFIX = 'couple_space_room_v3_';
 
-        // Регулярные выражения для строгой валидации логина и пароля
         const LOGIN_REGEX = /^[a-zA-Z0-9]{5,}$/;
         const PASSWORD_REGEX = /^[a-zA-Z0-9]{8,}$/;
         const PAIR_CODE_REGEX = /^[A-Z0-9]{10}$/;
 
-        // Криптографическое хеширование пароля SHA-256 с солью (защита конфиденциальности БД)
         async function hashPasswordSecure(login, rawPassword) {
             const salted = `couple_space_v3_salt::${login.toLowerCase()}::${rawPassword}`;
             if (window.crypto && window.crypto.subtle) {
@@ -1544,7 +1672,6 @@
                 const hashArray = Array.from(new Uint8Array(hashBuffer));
                 return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
             }
-            // Fallback хеш, если окружение без Web Crypto
             let h = 2166136261;
             for (let i = 0; i < salted.length; i++) {
                 h ^= salted.charCodeAt(i);
@@ -1553,7 +1680,6 @@
             return 'fnv1a_' + (h >>> 0).toString(16);
         }
 
-        // Полностью рандомная криптостойкая генерация 10-символьного кода комнаты пары
         function generatePairCode() {
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
             const randomBytes = new Uint8Array(10);
@@ -1569,7 +1695,6 @@
             return code;
         }
 
-        // Универсальный рендер аватара (поддерживает и загруженное фото data:image, и эмодзи)
         function renderAvatarElement(el, avatarVal) {
             if (!el) return;
             const val = avatarVal || '🥰';
@@ -1581,7 +1706,6 @@
             }
         }
 
-        // Проверка, подключен ли реально партнер к комнате
         function isPartnerConnected() {
             if (!appState || !currentUser) return false;
             const memberLogins = Object.keys(appState.members || {});
@@ -1616,18 +1740,14 @@
             }
         ];
 
-        // Текущий авторизованный пользователь
-        let currentUser = null; // { login, name, avatar, birthdate, bio, pairCode }
-        let authMode = 'login'; // 'login' | 'register'
+        let currentUser = null;
+        let authMode = 'login';
         let registerAvatar = '🥰';
-
-        // Общее состояние пары (синхронизируется по pairCode)
         let appState = null;
 
-        // Переменные UI
         let currentCreatorMode = 'draw';
         let currentMemoryFilter = 'all';
-        let currentAlbumSubtab = 'calendar'; // 'calendar' | 'feed'
+        let currentAlbumSubtab = 'calendar';
         let currentFoodSubtab = 'pantry';
         let selectedMoodEmoji = '☕';
         let selectedProductEmoji = '🥛';
@@ -1639,14 +1759,12 @@
         let brushColor = '#1E293B';
         let canvasHistory = [];
 
-        // Состояние календаря фото
         const nowInit = new Date();
         let calendarViewYear = nowInit.getFullYear();
-        let calendarViewMonth = nowInit.getMonth(); // 0..11
-        let activeDayModalDateKey = null; // 'YYYY-MM-DD'
+        let calendarViewMonth = nowInit.getMonth();
+        let activeDayModalDateKey = null;
         let pendingDayModalPhoto = null;
 
-        // Форматирование ключа даты YYYY-MM-DD
         function formatDateKey(dateObj) {
             const y = dateObj.getFullYear();
             const m = String(dateObj.getMonth() + 1).padStart(2, '0');
@@ -1665,23 +1783,17 @@
             return d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
         }
 
-        // Генерация красивого стартового рисунка на Canvas
         function createInitialSampleDrawing() {
             const c = document.createElement('canvas');
             c.width = 480;
             c.height = 480;
             const ctx = c.getContext('2d');
-
             ctx.fillStyle = '#FFFDF9';
             ctx.fillRect(0, 0, 480, 480);
-
-            // Мягкий декоративный круг
             ctx.fillStyle = '#FFF5F2';
             ctx.beginPath();
             ctx.arc(240, 220, 135, 0, Math.PI * 2);
             ctx.fill();
-
-            // Рисуем сердечко
             ctx.strokeStyle = '#E06D53';
             ctx.lineWidth = 10;
             ctx.lineCap = 'round';
@@ -1693,43 +1805,34 @@
             ctx.bezierCurveTo(240, 170, 250, 145, 275, 145);
             ctx.bezierCurveTo(335, 145, 330, 230, 240, 290);
             ctx.stroke();
-
-            // Подпись на холсте
             ctx.fillStyle = '#1E293B';
             ctx.font = 'bold 22px Inter, sans-serif';
             ctx.textAlign = 'center';
             ctx.fillText('Наше Пространство ✨', 240, 385);
-
             return c.toDataURL('image/jpeg', 0.85);
         }
 
-        // Генерация иллюстрации для демо-дней фото-календаря
         function createSampleMomentImage(bgTop, bgBottom, labelText, emojiIcon) {
             const c = document.createElement('canvas');
             c.width = 480;
             c.height = 480;
             const ctx = c.getContext('2d');
-
             const grad = ctx.createLinearGradient(0, 0, 480, 480);
             grad.addColorStop(0, bgTop || '#F0F4FA');
             grad.addColorStop(1, bgBottom || '#DCE6F5');
             ctx.fillStyle = grad;
             ctx.fillRect(0, 0, 480, 480);
-
             ctx.fillStyle = 'rgba(255, 255, 255, 0.75)';
             ctx.beginPath();
             ctx.arc(240, 210, 95, 0, Math.PI * 2);
             ctx.fill();
-
             ctx.font = '76px sans-serif';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText(emojiIcon || '💖', 240, 215);
-
             ctx.fillStyle = '#1E293B';
             ctx.font = 'bold 22px Inter, sans-serif';
             ctx.fillText(labelText || 'Теплый день', 240, 365);
-
             return c.toDataURL('image/jpeg', 0.85);
         }
 
@@ -1825,16 +1928,19 @@
             };
         }
 
-        // Умное объединение приходящих из облака данных комнаты без потери ни одного из двух партнеров
         function applyRemoteRoomUpdate(remoteState) {
             if (!remoteState || !currentUser) return;
+
+            if (remoteState.sharedFirebaseUrl && !instantRelayCloud.hasFirebaseUrl()) {
+                instantRelayCloud.setFirebaseUrl(remoteState.sharedFirebaseUrl);
+            }
+
             const prevMembersCount = Object.keys((appState && appState.members) || {}).length;
             const mergedMembers = {
                 ...((appState && appState.members) || {}),
                 ...(remoteState.members || {})
             };
 
-            // Гарантируем, что наш собственный профиль всегда присутствует в комнате
             const myPrev = mergedMembers[currentUser.login] || {};
             mergedMembers[currentUser.login] = {
                 name: currentUser.name,
@@ -1859,7 +1965,6 @@
                 saveRoomLocally(false);
                 renderAll();
 
-                // Если в комнате только что появился второй партнер, а на сервере еще не было нашей записи — пушим объединенный список
                 if (!remoteState.members || !remoteState.members[currentUser.login]) {
                     saveRoomLocally(true);
                 }
@@ -1868,18 +1973,46 @@
 
         async function manualForceSync() {
             if (!currentUser || !currentUser.pairCode) return;
-            showToast('Проверяем обновления от партнера...');
+            showToast('Синхронизация с партнером...');
             const remote = await instantRelayCloud.fetchRoomState(currentUser.pairCode);
             if (remote) {
                 applyRemoteRoomUpdate(remote);
+                showToast('Данные синхронизированы ✓');
             } else {
                 saveRoomLocally(true);
+                showToast('Отправлен сигнал партнеру ✓');
             }
         }
 
-        // ============================================================================
-        // 3. ИНИЦИАЛИЗАЦИЯ, ВАЛИДАЦИЯ И АВТОРИЗАЦИЯ (ЗАПОМИНАНИЕ НА УСТРОЙСТВЕ)
-        // ============================================================================
+        async function saveFirebaseUrlFromCabinet() {
+            const inp = document.getElementById('cabinetFirebaseUrlInput');
+            if (!inp) return;
+            const rawUrl = inp.value.trim();
+            if (!rawUrl) {
+                instantRelayCloud.setFirebaseUrl('');
+                renderSyncTabState();
+                showToast('Ссылка Firebase очищена (активен P2P режим)');
+                return;
+            }
+            if (!rawUrl.startsWith('https://')) {
+                showToast('Ссылка должна начинаться с https://...', 'error');
+                return;
+            }
+            instantRelayCloud.setFirebaseUrl(rawUrl);
+            inp.value = instantRelayCloud.cleanDbUrl();
+
+            if (currentUser && appState) {
+                const existing = await instantRelayCloud.fetchRoomState(currentUser.pairCode);
+                if (existing) {
+                    applyRemoteRoomUpdate(existing);
+                }
+                saveRoomLocally(true);
+                instantRelayCloud.saveAccountToCloud(currentUser.login, currentUser);
+            }
+            renderSyncTabState();
+            showToast('Облако Firebase подключено! Теперь связь работает 24/7 ❤️');
+        }
+
         window.onload = function () {
             initDrawingCanvas();
             const remDateEl = document.getElementById('reminderDateInput');
@@ -1887,7 +2020,6 @@
             checkActiveSession();
             lucide.createIcons();
 
-            // Слушаем изменения из другой вкладки браузера (для мгновенного теста двух аккаунтов)
             window.addEventListener('storage', (e) => {
                 if (currentUser && e.key === STORAGE_KEY_ROOMS_PREFIX + currentUser.pairCode && e.newValue) {
                     try {
@@ -1969,7 +2101,6 @@
             });
         }
 
-        // Живая проверка логина и пароля при вводе
         function validateAuthInputsLive() {
             const loginVal = document.getElementById('authLoginInput').value.trim();
             const passVal = document.getElementById('authPasswordInput').value.trim();
@@ -2045,7 +2176,7 @@
                 if (!existingAcc && githubCloudEngine.isConfigured()) {
                     existingAcc = await githubCloudEngine.fetchAccountFromGitHub(loginKey);
                 }
-                if (!existingAcc) {
+                if (!existingAcc && instantRelayCloud.hasFirebaseUrl()) {
                     existingAcc = await instantRelayCloud.fetchAccountFromCloud(loginKey);
                 }
                 if (existingAcc) {
@@ -2078,7 +2209,6 @@
                 await loginIntoSession(newAccount);
                 showToast(`Аккаунт ${displayName} создан!`);
             } else {
-                // Режим входа
                 let account = accountsDB[loginKey];
                 if (!account && window.cloudSyncBridge && window.cloudSyncBridge.ready) {
                     account = await window.cloudSyncBridge.fetchUserAccount(loginKey);
@@ -2086,7 +2216,7 @@
                 if (!account && githubCloudEngine.isConfigured()) {
                     account = await githubCloudEngine.fetchAccountFromGitHub(loginKey);
                 }
-                if (!account) {
+                if (!account && instantRelayCloud.hasFirebaseUrl()) {
                     account = await instantRelayCloud.fetchAccountFromCloud(loginKey);
                 }
                 if (account) {
@@ -2154,19 +2284,16 @@
 
             document.getElementById('authScreen').classList.add('hidden');
 
-            // Сначала загружаем локальный кэш для мгновенного отклика интерфейса
             loadOrCreateCoupleRoom(currentUser.pairCode, false);
             renderAll();
 
-            // Подписываемся на автоматическое облако реального времени (работает без токенов!)
             instantRelayCloud.subscribeRoom(currentUser.pairCode, (remoteState) => {
                 applyRemoteRoomUpdate(remoteState);
             });
 
-            // Проверяем, есть ли уже комната в облаке (например, созданная партнером)
-            const cloudRoom = await instantRelayCloud.fetchRoomState(currentUser.pairCode);
-            if (cloudRoom) {
-                applyRemoteRoomUpdate(cloudRoom);
+            const remoteRoom = await instantRelayCloud.fetchRoomState(currentUser.pairCode);
+            if (remoteRoom) {
+                applyRemoteRoomUpdate(remoteRoom);
             } else {
                 saveRoomLocally(true);
             }
@@ -2211,7 +2338,6 @@
             appState.pairCode = pairCode;
             ensureAppStateIntegrity();
 
-            // Регистрируем или обновляем текущего пользователя в комнате пары
             if (currentUser) {
                 if (!appState.members[currentUser.login]) {
                     appState.members[currentUser.login] = {
@@ -2283,9 +2409,6 @@
             }
         }
 
-        // ============================================================================
-        // 4. ПОЛУЧЕНИЕ ДАННЫХ ТЕКУЩЕГО ПОЛЬЗОВАТЕЛЯ И ВТОРОЙ ПОЛОВИНКИ
-        // ============================================================================
         function getMyMemberProfile() {
             if (!currentUser || !appState) {
                 return { name: 'Я', avatar: '🥰', moodEmoji: '☕', moodText: 'На связи' };
@@ -2319,9 +2442,6 @@
             return getPartnerMemberProfile().name;
         }
 
-        // ============================================================================
-        // 5. ОТРИСОВКА ИНТЕРФЕЙСА (RENDER ALL)
-        // ============================================================================
         function renderAll() {
             if (!currentUser || !appState) return;
             renderHeaderAndCounter();
@@ -2351,7 +2471,6 @@
                 document.getElementById('syncStatusText').textContent = 'Пара подключена • Синхронизация активна';
                 dotEl.className = 'w-2 h-2 rounded-full bg-emerald-500 shrink-0';
 
-                // Показываем счетчик дней вместе ТОЛЬКО когда партнер подключен
                 daysBtn.classList.remove('hidden');
                 connectBtn.classList.add('hidden');
 
@@ -2370,7 +2489,6 @@
                     `${months} мес., ${remDays} дн. и ${hours} ч. вашей общей истории`;
                 document.getElementById('anniversaryDateInput').value = appState.anniversaryDate;
             } else {
-                // Партнер еще не подключен: скрываем счетчик дней и НЕ показываем код пары в шапке
                 document.getElementById('headerCoupleNames').textContent = me.name;
                 document.getElementById('syncStatusText').textContent = 'Партнер еще не подключен';
                 dotEl.className = 'w-2 h-2 rounded-full bg-amber-400 shrink-0';
@@ -2379,7 +2497,6 @@
                 connectBtn.classList.remove('hidden');
             }
 
-            // Мое настроение и настроение партнера
             document.getElementById('myRoleLabel').textContent = me.name;
             document.getElementById('myMoodEmoji').textContent = me.moodEmoji || '☕';
             document.getElementById('myMoodText').textContent = me.moodText || 'На связи';
@@ -2403,9 +2520,6 @@
             return 'дней';
         }
 
-        // ============================================================================
-        // 6. ЕЖЕДНЕВНЫЙ ЗАПРОС ФОТО ДНЯ И ФОТО-КАЛЕНДАРЬ В АЛЬБОМЕ
-        // ============================================================================
         function renderDailyPhotoPrompt() {
             const todayKey = getTodayDateKey();
             const todayEntry = appState.dailyPhotos[todayKey];
@@ -2487,12 +2601,10 @@
             const monthTitle = monthDate.toLocaleDateString('ru-RU', { month: 'long', year: 'numeric' });
             document.getElementById('calendarMonthTitle').textContent = monthTitle;
 
-            // Определяем день недели 1-го числа (Пн = 0 ... Вс = 6)
             const firstWeekday = (monthDate.getDay() + 6) % 7;
             const daysInMonth = new Date(calendarViewYear, calendarViewMonth + 1, 0).getDate();
             const todayKey = getTodayDateKey();
 
-            // Пустые ячейки до первого дня месяца
             for (let i = 0; i < firstWeekday; i++) {
                 const emptyCell = document.createElement('div');
                 emptyCell.className = 'aspect-square rounded-2xl bg-slate-50/40';
@@ -2782,9 +2894,6 @@
             saveAndSync('Запись дня удалена из календаря');
         }
 
-        // ============================================================================
-        // 7. ЖИВОЙ ВИДЖЕТ И ЛЕНТА ВОСПОМИНАНИЙ
-        // ============================================================================
         function renderLocketWidget() {
             const latest = appState.locketFeed[0];
             if (!latest) return;
@@ -2948,9 +3057,6 @@
             });
         }
 
-        // ============================================================================
-        // 8. ВКЛАДКА «ЕДА»: КЛАДОВАЯ ОБЛАЧКОВ, СПИСОК ПОКУПОК И ЦЕПОЧКИ БЛЮД
-        // ============================================================================
         function switchFoodSubtab(subtab) {
             currentFoodSubtab = subtab;
             const pantryDiv = document.getElementById('foodSub-pantry');
@@ -3280,9 +3386,6 @@
             saveAndSync('Цепочка блюда удалена');
         }
 
-        // ============================================================================
-        // 9. ВКЛАДКА «КАБИНЕТ» (ЛИЧНЫЙ КАБИНЕТ, ДАТА РОЖДЕНИЯ, О СЕБЕ И 10-ЗНАЧНЫЙ КОД)
-        // ============================================================================
         function calculateBirthdayStats(birthdateStr) {
             if (!birthdateStr || !birthdateStr.includes('-')) return null;
             const parts = birthdateStr.split('-');
@@ -3358,227 +3461,30 @@
 
             document.getElementById('myPairCodeDisplay').textContent = currentUser.pairCode;
 
+            const fbInp = document.getElementById('cabinetFirebaseUrlInput');
+            if (fbInp && document.activeElement !== fbInp) {
+                fbInp.value = instantRelayCloud.cleanDbUrl() || '';
+            }
+
             const ghBadge = document.getElementById('githubCloudStatusBadge');
             if (ghBadge) {
-                if (githubCloudEngine.isConfigured()) {
-                    ghBadge.textContent = 'GitHub + Облако активны';
+                const openPeers = (instantRelayCloud.activeConns || []).filter(c => c && c.open).length;
+                if (instantRelayCloud.hasFirebaseUrl()) {
+                    ghBadge.textContent = openPeers > 0 ? 'Firebase 24/7 + P2P' : 'Firebase 24/7 активен';
+                    ghBadge.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200';
+                } else if (openPeers > 0) {
+                    ghBadge.textContent = 'Прямая связь (P2P)';
+                    ghBadge.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200';
+                } else if (githubCloudEngine.isConfigured()) {
+                    ghBadge.textContent = 'GitHub Cloud активен';
                     ghBadge.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200';
                 } else {
-                    ghBadge.textContent = 'Авто-Облако активно';
-                    ghBadge.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200';
+                    ghBadge.textContent = 'P2P Мост готов';
+                    ghBadge.className = 'text-[10px] font-semibold px-2 py-0.5 rounded-full bg-brand-50 text-brand-600 border border-brand-100';
                 }
             }
         }
 
-        function regenerateMyRoomCode() {
-            if (!currentUser) return;
-            const freshCode = generatePairCode();
-            currentUser.pairCode = freshCode;
-            persistCurrentUserProfile();
-            loadOrCreateCoupleRoom(freshCode, true);
-            instantRelayCloud.subscribeRoom(freshCode, (remoteState) => {
-                applyRemoteRoomUpdate(remoteState);
-            });
-            renderAll();
-            showToast(`Сгенерирован новый 10-значный код: ${freshCode}`);
-        }
-
-        function copyMyPairCode() {
-            if (!currentUser) return;
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(currentUser.pairCode).catch(() => {});
-            }
-            const temp = document.createElement('input');
-            temp.value = currentUser.pairCode;
-            document.body.appendChild(temp);
-            temp.select();
-            document.execCommand('copy');
-            document.body.removeChild(temp);
-            showToast(`Код ${currentUser.pairCode} скопирован!`);
-        }
-
-        function handleProfileAvatarUpload(event) {
-            const file = event.target.files[0];
-            if (!file || !currentUser) return;
-            compressImageFileToSquare(file, (compressedDataUrl) => {
-                currentUser.avatar = compressedDataUrl;
-                const me = getMyMemberProfile();
-                me.avatar = compressedDataUrl;
-                persistCurrentUserProfile();
-                saveAndSync('Фото профиля обновлено!');
-            });
-        }
-
-        function persistCurrentUserProfile() {
-            if (!currentUser) return;
-            const accountsDB = getLocalAccountsDB();
-            if (accountsDB[currentUser.login]) {
-                accountsDB[currentUser.login] = {
-                    ...accountsDB[currentUser.login],
-                    name: currentUser.name,
-                    avatar: currentUser.avatar,
-                    birthdate: currentUser.birthdate || '',
-                    bio: currentUser.bio || '',
-                    pairCode: currentUser.pairCode
-                };
-                saveLocalAccountsDB(accountsDB);
-                instantRelayCloud.saveAccountToCloud(currentUser.login, accountsDB[currentUser.login]);
-                if (window.cloudSyncBridge) {
-                    window.cloudSyncBridge.saveUserAccount(currentUser.login, accountsDB[currentUser.login]);
-                }
-                if (githubCloudEngine.isConfigured()) {
-                    githubCloudEngine.saveAccountToGitHub(currentUser.login, accountsDB[currentUser.login]);
-                }
-            }
-            if (localStorage.getItem(STORAGE_KEY_SESSION)) {
-                localStorage.setItem(STORAGE_KEY_SESSION, JSON.stringify(currentUser));
-            } else {
-                sessionStorage.setItem(STORAGE_KEY_SESSION, JSON.stringify(currentUser));
-            }
-        }
-
-        function saveMyPersonalCabinet() {
-            if (!currentUser || !appState) return;
-            const newName = document.getElementById('myDisplayNameInput').value.trim();
-            const newBirthdate = document.getElementById('myBirthdateInput').value;
-            const newBio = document.getElementById('myBioInput').value.trim();
-
-            if (!newName) {
-                showToast('Пожалуйста, укажите ваше имя', 'error');
-                return;
-            }
-
-            currentUser.name = newName;
-            currentUser.birthdate = newBirthdate;
-            currentUser.bio = newBio;
-
-            const me = getMyMemberProfile();
-            me.name = newName;
-            me.birthdate = newBirthdate;
-            me.bio = newBio;
-
-            persistCurrentUserProfile();
-            saveAndSync('Личный профиль сохранен!');
-        }
-
-        // ИСПРАВЛЕННАЯ ФУНКЦИЯ СВЯЗИ ДВУХ ТЕЛЕФОНОВ:
-        // Сначала скачивает комнату партнера из облака, добавляет второй телефон в members и синхронизирует обоих!
-        async function linkWithPartnerCode() {
-            const codeInput = document.getElementById('enterPartnerCodeInput');
-            const submitBtn = document.getElementById('linkPartnerSubmitBtn');
-            const newCode = codeInput.value.trim().toUpperCase();
-            if (!PAIR_CODE_REGEX.test(newCode)) {
-                showToast('Код комнаты должен состоять ровно из 10 латинских букв и цифр!', 'error');
-                return;
-            }
-
-            if (submitBtn) {
-                submitBtn.disabled = true;
-                submitBtn.innerHTML = '<span>Связываем...</span>';
-            }
-
-            currentUser.pairCode = newCode;
-            persistCurrentUserProfile();
-
-            // 1. Пытаемся сначала забрать существующую комнату партнера из облака (чтобы НЕ затереть её!)
-            let remoteRoom = await instantRelayCloud.fetchRoomState(newCode);
-            if (!remoteRoom && githubCloudEngine.isConfigured()) {
-                remoteRoom = await githubCloudEngine.fetchRoomState(newCode);
-            }
-
-            if (remoteRoom) {
-                appState = remoteRoom;
-                ensureAppStateIntegrity();
-            } else {
-                loadOrCreateCoupleRoom(newCode, false);
-            }
-
-            // 2. Регистрируем себя в списке участников этой комнаты
-            appState.pairCode = newCode;
-            appState.partnerLinkedManually = true;
-            if (!appState.members) appState.members = {};
-            appState.members[currentUser.login] = {
-                name: currentUser.name,
-                avatar: currentUser.avatar || '🥰',
-                birthdate: currentUser.birthdate || '',
-                bio: currentUser.bio || '',
-                moodEmoji: '💖',
-                moodText: 'Мы на связи!'
-            };
-
-            if (appState.fallbackPartner && appState.fallbackPartner.name === 'Партнер не подключен') {
-                appState.fallbackPartner.name = 'Вторая половинка';
-                appState.fallbackPartner.avatar = '💖';
-                appState.fallbackPartner.moodEmoji = '💖';
-                appState.fallbackPartner.moodText = 'Люблю тебя!';
-            }
-
-            // 3. Сохраняем и отправляем объединенную комнату обратно в облако (первый телефон тут же увидит подключение!)
-            saveRoomLocally(true);
-
-            // 4. Подписываемся на живые обновления этой комнаты
-            instantRelayCloud.subscribeRoom(newCode, (incomingState) => {
-                applyRemoteRoomUpdate(incomingState);
-            });
-
-            if (window.cloudSyncBridge && window.cloudSyncBridge.ready) {
-                window.cloudSyncBridge.subscribeCoupleRoom(newCode, (incomingState) => {
-                    applyRemoteRoomUpdate(incomingState);
-                });
-            }
-            if (githubCloudEngine.isConfigured()) {
-                githubCloudEngine.startPollingRoom(newCode, (incomingState) => {
-                    applyRemoteRoomUpdate(incomingState);
-                });
-            }
-
-            if (submitBtn) {
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = '<i data-lucide="link" class="w-3.5 h-3.5"></i><span>Связать</span>';
-            }
-
-            codeInput.value = '';
-            renderAll();
-            showToast('Пара успешно связана! Оба телефона синхронизированы ❤️');
-        }
-
-        let devTapCounter = 0;
-        function handleDevCloudTap() {
-            devTapCounter++;
-            if (devTapCounter >= 5) {
-                devTapCounter = 0;
-                const box = document.getElementById('devGithubSetupBox');
-                box.classList.toggle('hidden');
-                document.getElementById('devGhTokenInput').value = githubCloudEngine.token || '';
-                document.getElementById('devGhGistInput').value = githubCloudEngine.gistId || '';
-            }
-        }
-
-        async function saveDevGithubConfig() {
-            const t = document.getElementById('devGhTokenInput').value.trim();
-            const g = document.getElementById('devGhGistInput').value.trim();
-            if (!t) {
-                showToast('Введите токен ghp_...', 'error');
-                return;
-            }
-            githubCloudEngine.token = t;
-            githubCloudEngine.gistId = g;
-            localStorage.setItem('couple_embedded_gh_token', t);
-            if (g) localStorage.setItem('couple_embedded_gist_id', g);
-            const createdId = await githubCloudEngine.ensureMasterGist();
-            if (createdId) {
-                document.getElementById('devGhGistInput').value = createdId;
-                await githubCloudEngine.pushRoomState(currentUser.pairCode, appState);
-                renderSyncTabState();
-                showToast('Облако GitHub подключено! Gist ID: ' + createdId);
-            } else {
-                showToast('Не удалось подключиться к GitHub, проверьте токен', 'error');
-            }
-        }
-
-        // ============================================================================
-        // 10. ХОЛСТ ДЛЯ РИСОВАНИЯ И ЖИВАЯ КАМЕРА
-        // ============================================================================
         function initDrawingCanvas() {
             const canvas = document.getElementById('drawingCanvas');
             if (!canvas) return;
@@ -3740,7 +3646,7 @@
             const sy = ((video.videoHeight || 480) - size) / 2;
             ctx.drawImage(video, sx, sy, size, size, 0, 0, 480, 480);
 
-            pendingPhotoDataUrl = c.toDataURL('image/jpeg', 0.72);
+            pendingPhotoDataUrl = c.toDataURL('image/jpeg', 0.78);
             stopLiveCamera();
             showCapturedPhotoPreview(pendingPhotoDataUrl);
         }
@@ -3776,14 +3682,14 @@
                 const img = new Image();
                 img.onload = function () {
                     const canvas = document.createElement('canvas');
-                    canvas.width = 400;
-                    canvas.height = 400;
+                    canvas.width = 480;
+                    canvas.height = 480;
                     const ctx = canvas.getContext('2d');
                     const size = Math.min(img.width, img.height);
                     const sx = (img.width - size) / 2;
                     const sy = (img.height - size) / 2;
-                    ctx.drawImage(img, sx, sy, size, size, 0, 0, 400, 400);
-                    callback(canvas.toDataURL('image/jpeg', 0.72));
+                    ctx.drawImage(img, sx, sy, size, size, 0, 0, 480, 480);
+                    callback(canvas.toDataURL('image/jpeg', 0.78));
                 };
                 img.src = e.target.result;
             };
@@ -3795,7 +3701,7 @@
 
             if (currentCreatorMode === 'draw') {
                 const canvas = document.getElementById('drawingCanvas');
-                finalImageData = canvas.toDataURL('image/jpeg', 0.78);
+                finalImageData = canvas.toDataURL('image/jpeg', 0.82);
             } else {
                 if (!pendingPhotoDataUrl) {
                     showToast('Сначала сделайте снимок или выберите фотографию', 'error');
@@ -3868,9 +3774,6 @@
             saveAndSync('Отправлено сердечко ❤️');
         }
 
-        // ============================================================================
-        // 11. ДЕЙСТВИЯ: АЛЬБОМ, ЗАМЕТКИ, НАПОМИНАНИЯ, СТАТУСЫ
-        // ============================================================================
         function setMemoryFilter(filter) {
             currentMemoryFilter = filter;
             ['all', 'daily', 'locket', 'album'].forEach(f => {
@@ -4034,9 +3937,6 @@
             if (toastMsg) showToast(toastMsg);
         }
 
-        // ============================================================================
-        // 12. НАВИГАЦИЯ ПО ВКЛАДКАМ И УВЕДОМЛЕНИЯ
-        // ============================================================================
         function switchTab(tabId) {
             const tabs = ['menu', 'memories', 'food', 'notes', 'sync'];
             tabs.forEach(t => {
