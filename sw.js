@@ -1,4 +1,4 @@
-const CACHE_NAME = 'couple-space-pwa-v2';
+const CACHE_NAME = 'couple-space-pwa-v3';
 const ASSETS = [
   './',
   './index.html',
@@ -29,6 +29,12 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
   
+  const url = new URL(event.request.url);
+  // Не перехватываем внешние скрипты (CDN, Firebase, ntfy), чтобы не ломать сеть
+  if (url.origin !== location.origin) {
+    return;
+  }
+
   // Для запросов навигации отдаем index.html (исправление ошибки 404 на GitHub Pages)
   if (event.request.mode === 'navigate') {
     event.respondWith(
@@ -40,7 +46,6 @@ self.addEventListener('fetch', (event) => {
   event.respondWith(
     fetch(event.request)
       .then((response) => {
-        // Кешируем успешные GET-запросы
         if (response && response.status === 200 && response.type === 'basic') {
           const responseClone = response.clone();
           caches.open(CACHE_NAME).then((cache) => {
