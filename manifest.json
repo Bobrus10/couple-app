@@ -1,38 +1,34 @@
 {
-  "background_color": "#ffffff",
-  "dir": "ltr",
-  "display": "standalone",
-  "name": "Наше Пространство",
-  "orientation": "any",
-  "scope": "/",
-  "short_name": "Наше Пространство",
-  "start_url": "/",
-  "theme_color": "#F8FAFC",
-  "icons": [
-    {
-      "src": "data:image/svg+xml,&lt;svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'&gt;&lt;rect width='512' height='512' rx='128' fill='%232B5B84'/&gt;&lt;path d='M256 396s-136-83.5-136-178c0-45.5 35.5-82 80-82 27.5 0 52 14.5 56 36 4-21.5 28.5-36 56-36 44.5 0 80 36.5 80 82 0 94.5-136 178-136 178z' fill='%23E06D53'/&gt;&lt;/svg&gt;",
-      "type": "image/svg+xml",
-      "isSquare": false,
-      "isPng": false,
-      "isWebp": false,
-      "isJpg": false,
-      "width": 0,
-      "is512x512": false,
-      "is256x256": false,
-      "is192x192": false
-    },
-    {
-      "src": "https://placehold.co/512x512/2B5B84/FFFFFF.png?text=Couple",
-      "type": "image/png",
-      "sizes": "512x512",
-      "isSquare": true,
-      "isPng": true,
-      "isWebp": false,
-      "isJpg": false,
-      "width": 512,
-      "is512x512": true,
-      "is256x256": false,
-      "is192x192": false
-    }
-  ]
+"id": "/couple-app/",
+"name": "Наше Пространство — Приложение для пар",
+"short_name": "Наше Пространство",
+"description": "Уютный дневник пары, фото-календарь каждого дня, общие списки и живые рисунки",
+"dir": "ltr",
+"lang": "ru",
+"start_url": "./index.html",
+"scope": "./",
+"display": "standalone",
+"orientation": "portrait",
+"background_color": "#F8FAFC",
+"theme_color": "#2B5B84",
+"icons": [
+{
+"src": "https://placehold.co/192x192/2B5B84/FFFFFF.png?text=Love",
+"sizes": "192x192",
+"type": "image/png",
+"purpose": "any"
+},
+{
+"src": "https://placehold.co/512x512/2B5B84/FFFFFF.png?text=Love",
+"sizes": "512x512",
+"type": "image/png",
+"purpose": "any"
+},
+{
+"src": "https://placehold.co/512x512/2B5B84/FFFFFF.png?text=Love",
+"sizes": "512x512",
+"type": "image/png",
+"purpose": "maskable"
+}
+]
 }
