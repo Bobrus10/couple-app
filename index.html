@@ -15,7 +15,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- PeerJS (Прямая P2P связь между двумя телефонами без серверов и CORS) -->
+    <!-- PeerJS: Прямая P2P связь между двумя телефонами без серверов и лимитов -->
     <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
     <script>
         tailwind.config = {
@@ -83,7 +83,7 @@
     <div class="w-full max-w-[440px] min-h-screen md:min-h-[860px] md:max-h-[92vh] bg-[#F8FAFC] md:rounded-[36px] md:shadow-[0_20px_60px_-15px_rgba(15,23,42,0.12)] md:border md:border-slate-200/80 flex flex-col justify-between overflow-hidden relative">
 
         <!-- ========================================================================= -->
-        <!-- ЭКРАН АВТОРИЗАЦИИ И РЕГИСТРАЦИИ (Показывается, если пользователь не вошел) -->
+        <!-- ЭКРАН АВТОРИЗАЦИИ И РЕГИСТРАЦИИ -->
         <!-- ========================================================================= -->
         <div id="authScreen" class="hidden absolute inset-0 z-40 bg-[#F8FAFC] flex flex-col justify-between p-6 overflow-y-auto">
             <div class="my-auto space-y-6 py-4">
@@ -98,10 +98,10 @@
 
                 <!-- Переключатель Вход / Регистрация -->
                 <div class="bg-slate-200/70 p-1 rounded-2xl grid grid-cols-2 gap-1">
-                    <button id="authTabLoginBtn" onclick="switchAuthMode('login')" class="py-2.5 rounded-xl text-xs font-bold bg-white text-slate-900 shadow-sm transition">
+                    <button id="authTabLoginBtn" type="button" onclick="switchAuthMode('login')" class="py-2.5 rounded-xl text-xs font-bold bg-white text-slate-900 shadow-sm transition">
                         Вход в аккаунт
                     </button>
-                    <button id="authTabRegisterBtn" onclick="switchAuthMode('register')" class="py-2.5 rounded-xl text-xs font-bold text-slate-600 hover:text-slate-900 transition">
+                    <button id="authTabRegisterBtn" type="button" onclick="switchAuthMode('register')" class="py-2.5 rounded-xl text-xs font-bold text-slate-600 hover:text-slate-900 transition">
                         Регистрация
                     </button>
                 </div>
@@ -184,7 +184,7 @@
                 <div class="bg-emerald-50/70 border border-emerald-200/80 rounded-2xl p-3 flex items-center gap-2.5">
                     <i data-lucide="shield-check" class="w-4 h-4 text-emerald-600 shrink-0"></i>
                     <p class="text-[11px] text-emerald-800 leading-tight">
-                        <strong>Защита данных:</strong> пароли шифруются алгоритмом SHA-256, а доступ к комнате пары изолирован по 10-значному ключу.
+                        <strong>Защита данных:</strong> пароли шифруются алгоритмом SHA-256, а связь пары работает по согласию партнеров.
                     </p>
                 </div>
             </div>
@@ -192,7 +192,7 @@
             <p class="text-[11px] text-center text-slate-400">Автоматический вход активен до выхода из профиля</p>
         </div>
 
-        <!-- ВЕРХНЯЯ ШАПКА: Имена, статус связи (БЕЗ кода пары сверху) и условный счетчик дней -->
+        <!-- ВЕРХНЯЯ ШАПКА: Имена, статус связи и счетчик дней -->
         <header class="bg-white/90 backdrop-blur-md border-b border-slate-100 px-5 pt-4 pb-3.5 sticky top-0 z-30">
             <div class="flex items-center justify-between gap-2 mb-3">
                 <!-- Аватарка и имена (клик открывает Личный кабинет) -->
@@ -247,10 +247,10 @@
                         <span id="partnerMoodEmoji" class="text-lg leading-none">💖</span>
                         <div class="truncate">
                             <div class="text-[10px] uppercase tracking-wider font-semibold text-warm-600/70" id="partnerRoleLabel">Партнер</div>
-                            <div class="text-xs font-medium text-slate-700 truncate" id="partnerMoodText">Скучаю по тебе!</div>
+                            <div class="text-xs font-medium text-slate-700 truncate" id="partnerMoodText">Подключите в Кабинете</div>
                         </div>
                     </div>
-                    <button type="button" onclick="manualForceSync()" title="Обновить синхронизацию" class="p-1 text-slate-400 hover:text-brand-600 active:rotate-180 transition shrink-0">
+                    <button type="button" onclick="manualForceSync()" title="Проверить связь и запросы" class="p-1 text-slate-400 hover:text-brand-600 active:rotate-180 transition shrink-0">
                         <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
                     </button>
                 </div>
@@ -268,7 +268,7 @@
                     <div class="flex items-start justify-between gap-3">
                         <div class="flex items-center gap-2.5">
                             <div class="w-10 h-10 rounded-2xl bg-white/15 backdrop-blur-md flex items-center justify-center shrink-0">
-                                <i data-lucide="calendar-camera" class="w-5 h-5 text-white"></i>
+                                <i data-lucide="calendar-heart" class="w-5 h-5 text-white"></i>
                             </div>
                             <div>
                                 <div class="flex items-center gap-1.5">
@@ -317,7 +317,7 @@
                             <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                             <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Живая карточка пары</span>
                         </div>
-                        <span id="locketTimestamp" class="text-xs text-slate-400 font-medium">Сегодня, 14:20</span>
+                        <span id="locketTimestamp" class="text-xs text-slate-400 font-medium">Сегодня</span>
                     </div>
 
                     <!-- Квадратная карточка -->
@@ -445,6 +445,7 @@
 
             <!-- ================= ВКЛАДКА 2: АЛЬБОМ (Фото-календарь по дням + Лента воспоминаний) ================= -->
             <section id="tab-memories" class="hidden space-y-5 animate-fade">
+                <!-- Переключатель внутри Альбома -->
                 <div class="bg-white p-1.5 rounded-2xl border border-slate-200/80 grid grid-cols-2 gap-1 shadow-sm">
                     <button id="albumSubBtn-calendar" type="button" onclick="switchAlbumSubtab('calendar')" class="py-2 px-3 rounded-xl text-xs font-semibold bg-brand-500 text-white shadow-sm transition flex items-center justify-center gap-1.5">
                         <i data-lucide="calendar-heart" class="w-3.5 h-3.5"></i>
@@ -456,6 +457,7 @@
                     </button>
                 </div>
 
+                <!-- ПОДРАЗДЕЛ АЛЬБОМА 1: КАЛЕНДАРЬ ФОТО ДНЯ -->
                 <div id="albumSub-calendar" class="space-y-4">
                     <div class="bg-white rounded-3xl p-4 shadow-sm border border-slate-100 space-y-4">
                         <div class="flex items-center justify-between">
@@ -514,6 +516,7 @@
                     </div>
                 </div>
 
+                <!-- ПОДРАЗДЕЛ АЛЬБОМА 2: ЛЕНТА ВСЕХ ВОСПОМИНАНИЙ -->
                 <div id="albumSub-feed" class="hidden space-y-4">
                     <div class="flex items-center justify-between">
                         <div>
@@ -622,6 +625,7 @@
                     </button>
                 </div>
 
+                <!-- ПОДРАЗДЕЛ 1: КЛАДОВАЯ ОБЛАЧКОВ И СПИСОК В МАГАЗИН -->
                 <div id="foodSub-pantry" class="space-y-5">
                     <div class="bg-white rounded-3xl p-4 shadow-sm border border-slate-100 space-y-3.5">
                         <div class="flex items-center justify-between gap-2">
@@ -680,6 +684,7 @@
                     </div>
                 </div>
 
+                <!-- ПОДРАЗДЕЛ 2: ЦЕПОЧКИ БЛЮД -->
                 <div id="foodSub-chains" class="hidden space-y-4">
                     <div class="bg-white rounded-3xl p-4 shadow-sm border border-slate-100 flex items-center justify-between gap-2">
                         <div>
@@ -696,7 +701,7 @@
                 </div>
             </section>
 
-            <!-- ================= ВКЛАДКА 5: ЛИЧНЫЙ КАБИНЕТ, ПРОФИЛЬ ПАРТНЕРА И ЗАЩИЩЕННАЯ СВЯЗЬ ================= -->
+            <!-- ================= ВКЛАДКА 5: ЛИЧНЫЙ КАБИНЕТ, ПРОФИЛЬ ПАРТНЕРА И СВЯЗЬ ================= -->
             <section id="tab-sync" class="hidden space-y-5 animate-fade">
                 
                 <!-- Карточка 1: ЛИЧНЫЙ КАБИНЕТ ПОЛЬЗОВАТЕЛЯ -->
@@ -772,7 +777,7 @@
                     </div>
                 </div>
 
-                <!-- Карточка 3: Связь двух телефонов по 10-символьному коду комнаты -->
+                <!-- Карточка 3: Связь двух телефонов по 10-символьному коду комнаты и принятие запроса -->
                 <div class="bg-white rounded-3xl p-5 shadow-sm border border-slate-100 space-y-5">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center gap-2.5">
@@ -781,10 +786,33 @@
                             </div>
                             <div>
                                 <h3 class="text-sm font-bold text-slate-900">Секретный 10-значный код пары</h3>
-                                <p class="text-[11px] text-slate-500">Доступен только здесь в личном кабинете</p>
+                                <p class="text-[11px] text-slate-500">Передайте код половинке и примите запрос</p>
                             </div>
                         </div>
                         <span id="pairConnectionBadge" class="text-[11px] font-bold px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200">Ожидание</span>
+                    </div>
+
+                    <!-- ВХОДЯЩИЙ ЗАПРОС В КАБИНЕТЕ (Появляется на втором телефоне, когда партнер ввел ваш код!) -->
+                    <div id="cabinetIncomingRequestBanner" class="hidden bg-warm-50 border-2 border-warm-500/40 rounded-2xl p-4 space-y-3 animate-fade shadow-sm">
+                        <div class="flex items-center gap-3">
+                            <div id="cabinetIncomingAvatar" class="w-12 h-12 rounded-2xl bg-white border border-warm-200 flex items-center justify-center text-2xl shrink-0 overflow-hidden shadow-sm">
+                                💖
+                            </div>
+                            <div class="min-w-0 flex-1">
+                                <span class="text-[10px] font-bold uppercase tracking-wider text-warm-600">Входящий запрос на подключение!</span>
+                                <h4 id="cabinetIncomingName" class="text-sm font-extrabold text-slate-900 truncate">Партнер хочет создать пару</h4>
+                                <p class="text-[11px] text-slate-600">Нажмите «Принять», чтобы связать оба телефона</p>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button type="button" onclick="declineIncomingPartnerRequest()" class="py-2 px-3 rounded-xl bg-white hover:bg-slate-100 text-slate-600 text-xs font-semibold border border-slate-200 transition">
+                                Отклонить
+                            </button>
+                            <button type="button" onclick="acceptIncomingPartnerRequest()" class="py-2 px-3 rounded-xl bg-brand-500 hover:bg-brand-600 active:scale-95 text-white text-xs font-bold shadow-sm transition flex items-center justify-center gap-1.5">
+                                <i data-lucide="heart" class="w-3.5 h-3.5 fill-white"></i>
+                                <span>Принять пару ❤️</span>
+                            </button>
+                        </div>
                     </div>
 
                     <!-- Ваш 10-символьный рандомный код комнаты -->
@@ -806,8 +834,8 @@
 
                     <!-- Подключиться к 10-символьному коду партнера -->
                     <div class="space-y-2">
-                        <label class="text-xs font-bold text-slate-700 block">Ввести 10-значный код партнера</label>
-                        <p class="text-[11px] text-slate-400">Введите код второй половинки (ровно 10 латинских букв/цифр), чтобы соединить ваши аккаунты и включить счетчик дней:</p>
+                        <label class="text-xs font-bold text-slate-700 block">Отправить запрос по 10-значному коду партнера</label>
+                        <p class="text-[11px] text-slate-400">Введите код вашей половинки и нажмите «Связать» — на её телефоне сразу всплывет окно с кнопкой «Принять пару ❤️»:</p>
                         <div class="flex gap-2 pt-1">
                             <input id="enterPartnerCodeInput" type="text" maxlength="10" placeholder="Например: K8M2X9P4LQ" class="flex-1 bg-slate-50 border border-slate-200 rounded-2xl px-3.5 py-2.5 text-xs font-mono font-bold uppercase tracking-widest focus:outline-none focus:border-brand-500">
                             <button id="linkPartnerSubmitBtn" type="button" onclick="linkWithPartnerCode()" class="bg-slate-900 hover:bg-slate-800 active:scale-95 text-white px-4 py-2.5 rounded-2xl text-xs font-semibold flex items-center gap-1.5 transition shrink-0">
@@ -817,36 +845,23 @@
                         </div>
                     </div>
 
-                    <!-- НАСТРОЙКА ПОСТОЯННОГО ОБЛАКА FIREBASE 24/7 ПРЯМО В ПРИЛОЖЕНИИ (БЕЗ ПРАВКИ КОДА!) -->
-                    <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200/80 space-y-3">
+                    <!-- Настройка постоянной облачной базы 24/7 прямо из интерфейса (без залезания в код!) -->
+                    <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200/80 space-y-2.5">
                         <div class="flex items-center justify-between">
                             <div class="flex items-center gap-2 text-xs font-bold text-slate-800">
                                 <i data-lucide="cloud" class="w-4 h-4 text-brand-600"></i>
                                 <span>Облачная база пары (24/7)</span>
                             </div>
-                            <span id="githubCloudStatusBadge" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">P2P Мост активен</span>
+                            <span id="githubCloudStatusBadge" class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">P2P-мост активен</span>
                         </div>
                         <p class="text-[11px] text-slate-500 leading-relaxed">
-                            Когда приложение открыто на обоих телефонах одновременно, они связываются напрямую через <strong>P2P-мост</strong>. А чтобы фото и списки хранились в облаке круглосуточно (даже когда второй телефон выключен), вставьте ссылку вашей бесплатной базы <strong>Firebase Realtime Database</strong>:
+                            Когда оба телефона открыты, они связываются напрямую через P2P. Чтобы данные ждали партнера даже при выключенном телефоне, можно вставить бесплатную ссылку Firebase Realtime DB:
                         </p>
-                        <div class="space-y-2">
-                            <input id="cabinetFirebaseUrlInput" type="url" placeholder="https://ваш-проект-default-rtdb.firebaseio.com" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-mono focus:outline-none focus:border-brand-500">
-                            <button type="button" onclick="saveCabinetFirebaseUrl()" class="w-full bg-brand-500 hover:bg-brand-600 active:scale-[0.99] text-white py-2 rounded-xl text-xs font-semibold transition flex items-center justify-center gap-1.5">
-                                <i data-lucide="database" class="w-3.5 h-3.5"></i>
-                                <span>Подключить облако Firebase 24/7</span>
+                        <div class="flex gap-2">
+                            <input id="customFirebaseUrlInput" type="url" placeholder="https://ваш-проект-default-rtdb.firebaseio.com" class="flex-1 bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-brand-500">
+                            <button type="button" onclick="saveCustomFirebaseUrl()" class="bg-brand-500 hover:bg-brand-600 active:scale-95 text-white px-3 py-2 rounded-xl text-xs font-semibold shrink-0 transition">
+                                Сохранить
                             </button>
-                        </div>
-
-                        <!-- Скрытая панель GitHub Gist (по 5 кликам) -->
-                        <div class="pt-1">
-                            <button type="button" onclick="handleDevCloudTap()" class="text-[10px] text-slate-400 hover:text-slate-600">
-                                Дополнительно: защита SHA-256 и резервный Gist
-                            </button>
-                            <div id="devGithubSetupBox" class="hidden pt-2 mt-2 border-t border-slate-200 space-y-2">
-                                <input id="devGhTokenInput" type="password" placeholder="GitHub Token (ghp_...)" class="w-full bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 text-xs">
-                                <input id="devGhGistInput" type="text" placeholder="Gist ID" class="w-full bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 text-xs">
-                                <button type="button" onclick="saveDevGithubConfig()" class="w-full bg-slate-900 text-white py-1.5 rounded-xl text-xs font-semibold">Сохранить Gist</button>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -854,7 +869,7 @@
 
         </main>
 
-        <!-- НИЖНЯЯ НАВИГАЦИЯ (5 ВКЛАДОК: Меню, Альбом, Еда, Планы, Кабинет) -->
+        <!-- НИЖНЯЯ НАВИГАЦИЯ (5 ВКЛАДОК) -->
         <nav class="bg-white/95 backdrop-blur-md border-t border-slate-200/80 px-2 py-2 sticky bottom-0 z-30">
             <div class="grid grid-cols-5 gap-1">
                 <button type="button" onclick="switchTab('menu')" id="nav-menu" class="flex flex-col items-center justify-center py-1.5 rounded-2xl text-brand-600 bg-brand-50/80 font-semibold transition">
@@ -879,6 +894,35 @@
                 </button>
             </div>
         </nav>
+
+        <!-- ========================================================================= -->
+        <!-- МОДАЛЬНОЕ ОКНО ВХОДЯЩЕГО ЗАПРОСА НА ПОДКЛЮЧЕНИЕ ПАРЫ (ВСПЛЫВАЕТ НА ЭКРАНЕ) -->
+        <!-- ========================================================================= -->
+        <div id="incomingPairRequestModal" class="hidden fixed inset-0 z-50 bg-slate-900/55 backdrop-blur-sm flex items-center justify-center p-4">
+            <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-warm-100 space-y-4 animate-fade text-center">
+                <div id="incomingPartnerAvatarBox" class="w-16 h-16 rounded-3xl bg-warm-50 border border-warm-200 flex items-center justify-center text-3xl mx-auto overflow-hidden shadow-sm">
+                    💖
+                </div>
+                <div class="space-y-1.5">
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-warm-600 bg-warm-50 px-2.5 py-1 rounded-full border border-warm-100">Входящий запрос пары</span>
+                    <h3 class="text-base font-extrabold text-slate-900 pt-1">
+                        <span id="incomingPartnerNameLabel">Партнер</span> хочет связать аккаунты!
+                    </h3>
+                    <p class="text-xs text-slate-500 leading-relaxed">
+                        Дайте согласие на подключение, чтобы объединить ваши телефоны, включить счетчик дней вместе и синхронизировать фото-календарь.
+                    </p>
+                </div>
+                <div class="grid grid-cols-2 gap-2.5 pt-2">
+                    <button type="button" onclick="declineIncomingPartnerRequest()" class="py-3 px-4 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-semibold transition">
+                        Позже
+                    </button>
+                    <button type="button" onclick="acceptIncomingPartnerRequest()" class="py-3 px-4 rounded-2xl bg-brand-500 hover:bg-brand-600 active:scale-95 text-white text-xs font-bold shadow-md transition flex items-center justify-center gap-1.5">
+                        <i data-lucide="heart" class="w-4 h-4 fill-white"></i>
+                        <span>Принять пару ❤️</span>
+                    </button>
+                </div>
+            </div>
+        </div>
 
         <!-- МОДАЛЬНОЕ ОКНО: Карточка Дня в Фото-Календаре -->
         <div id="dayCalendarModal" class="hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
@@ -1145,13 +1189,90 @@
 
     </div>
 
+    <!-- Встроенная облачная синхронизация Firebase (если доступна в окружении) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        window.cloudSyncBridge = {
+            ready: false,
+            db: null,
+            auth: null,
+            appId: typeof __app_id !== 'undefined' ? __app_id : 'couple-space-app',
+            unsubscribeRoom: null,
+
+            async init() {
+                try {
+                    if (typeof __firebase_config === 'undefined' || !__firebase_config) return;
+                    const config = JSON.parse(__firebase_config);
+                    const app = initializeApp(config);
+                    this.auth = getAuth(app);
+                    this.db = getFirestore(app);
+
+                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                        await signInWithCustomToken(this.auth, __initial_auth_token);
+                    } else {
+                        await signInAnonymously(this.auth);
+                    }
+                    this.ready = true;
+                    if (window.onCloudBridgeReady) window.onCloudBridgeReady();
+                } catch (e) {}
+            },
+
+            async saveUserAccount(loginKey, accountObj) {
+                if (!this.ready || !this.auth.currentUser) return;
+                try {
+                    const ref = doc(this.db, 'artifacts', this.appId, 'public', 'data', 'accounts', loginKey);
+                    await setDoc(ref, accountObj, { merge: true });
+                } catch (e) {}
+            },
+
+            async fetchUserAccount(loginKey) {
+                if (!this.ready || !this.auth.currentUser) return null;
+                try {
+                    const ref = doc(this.db, 'artifacts', this.appId, 'public', 'data', 'accounts', loginKey);
+                    const snap = await getDoc(ref);
+                    return snap.exists() ? snap.data() : null;
+                } catch (e) {
+                    return null;
+                }
+            },
+
+            async pushCoupleRoom(pairCode, stateObj) {
+                if (!this.ready || !this.auth.currentUser || !pairCode) return;
+                try {
+                    const ref = doc(this.db, 'artifacts', this.appId, 'public', 'data', 'couple_rooms', pairCode);
+                    await setDoc(ref, { payload: JSON.stringify(stateObj), updatedAt: Date.now() }, { merge: true });
+                } catch (e) {}
+            },
+
+            subscribeCoupleRoom(pairCode, callback) {
+                if (!this.ready || !this.auth.currentUser || !pairCode) return;
+                if (this.unsubscribeRoom) this.unsubscribeRoom();
+                const ref = doc(this.db, 'artifacts', this.appId, 'public', 'data', 'couple_rooms', pairCode);
+                this.unsubscribeRoom = onSnapshot(ref, (snap) => {
+                    if (snap.exists()) {
+                        const data = snap.data();
+                        if (data && data.payload) {
+                            try {
+                                callback(JSON.parse(data.payload));
+                            } catch (err) {}
+                        }
+                    }
+                }, (err) => {});
+            }
+        };
+
+        window.cloudSyncBridge.init();
+    </script>
+
     <script>
         // ============================================================================
-        // 1. ГИБРИДНЫЙ ДВИЖОК СИНХРОНИЗАЦИИ (WebRTC PeerJS P2P + Firebase REST 24/7)
+        // 1. ГИБРИДНЫЙ ДВИЖОК СИНХРОНИЗАЦИИ И ПРИНЯТИЯ ЗАПРОСОВ ПАРЫ
+        // Объединяет прямой WebRTC-мост (PeerJS) + мгновенные сигналы + Firebase DB
         // ============================================================================
         const DEFAULT_FIREBASE_DB_URL = '';
-        const EMBEDDED_GITHUB_TOKEN = '';
-        const EMBEDDED_MASTER_GIST_ID = '';
 
         const instantRelayCloud = {
             dbUrl: DEFAULT_FIREBASE_DB_URL || localStorage.getItem('cs_custom_firebase_url') || '',
@@ -1161,24 +1282,15 @@
             onUpdateCallback: null,
             reconnectTimer: null,
             pollTimer: null,
+            signalEventSource: null,
 
             cleanDbUrl() {
                 const raw = (this.dbUrl || '').trim().replace(/\/+$/, '');
                 return raw.startsWith('https://') ? raw : '';
             },
 
-            hasFirebaseUrl() {
-                return Boolean(this.cleanDbUrl());
-            },
-
-            setFirebaseUrl(url) {
-                const cleaned = String(url || '').trim().replace(/\/+$/, '');
-                this.dbUrl = cleaned;
-                if (cleaned) {
-                    localStorage.setItem('cs_custom_firebase_url', cleaned);
-                } else {
-                    localStorage.removeItem('cs_custom_firebase_url');
-                }
+            getSignalChannel(pairCode) {
+                return 'cs_v6_pair_sig_' + String(pairCode || '').trim().toUpperCase();
             },
 
             initPeerBridge(pairCode, onUpdateCallback) {
@@ -1220,7 +1332,7 @@
                     p.on('error', (err) => {
                         if (err && err.type === 'unavailable-id' && myId === hostId) {
                             try { p.destroy(); } catch (e) {}
-                            setTimeout(() => tryCreatePeer(guestId, hostId), 250);
+                            tryCreatePeer(guestId, hostId);
                         }
                     });
                 };
@@ -1230,17 +1342,17 @@
                 this.reconnectTimer = setInterval(() => {
                     if (!this.peer || this.peer.destroyed) return;
                     const openConns = this.activeConns.filter(c => c && c.open);
-                    if (openConns.length === 0 && this.peer.open) {
+                    if (openConns.length === 0) {
                         const targetId = this.peer.id === hostId ? guestId : hostId;
                         this.connectToPartnerPeer(targetId);
                     }
-                }, 4000);
+                }, 4500);
             },
 
             connectToPartnerPeer(targetId) {
                 if (!this.peer || !this.peer.open) return;
-                const alreadyOpen = this.activeConns.some(c => c.peer === targetId && c.open);
-                if (alreadyOpen) return;
+                const alreadyConnected = this.activeConns.some(c => c.peer === targetId && c.open);
+                if (alreadyConnected) return;
                 try {
                     const conn = this.peer.connect(targetId, { reliable: true });
                     this.setupPeerConnection(conn);
@@ -1252,67 +1364,133 @@
                 conn.on('open', () => {
                     this.activeConns = this.activeConns.filter(c => c.peer !== conn.peer);
                     this.activeConns.push(conn);
-
-                    if (typeof renderSyncTabState === 'function') renderSyncTabState();
+                    renderSyncTabState();
 
                     if (typeof appState !== 'undefined' && appState) {
                         conn.send({
                             type: 'ROOM_SYNC',
                             pairCode: this.currentRoomCode,
-                            firebaseUrl: this.cleanDbUrl(),
                             state: appState
                         });
                     }
                 });
 
                 conn.on('data', (data) => {
-                    if (data && data.type === 'ROOM_SYNC' && data.state) {
-                        if (data.firebaseUrl && !this.hasFirebaseUrl()) {
-                            this.setFirebaseUrl(data.firebaseUrl);
-                        }
-                        const prevMemberCount = Object.keys((appState && appState.members) || {}).length;
+                    if (!data) return;
+                    if (data.type === 'PAIR_JOIN_REQUEST' && data.requester) {
+                        handleIncomingJoinRequestSignal(data.requester, data.pairCode);
+                    } else if (data.type === 'ROOM_SYNC' && data.state) {
                         if (this.onUpdateCallback) {
                             this.onUpdateCallback(data.state);
-                        }
-                        const newMemberCount = Object.keys((appState && appState.members) || {}).length;
-                        if (newMemberCount > prevMemberCount && typeof appState !== 'undefined') {
-                            setTimeout(() => {
-                                if (conn.open) {
-                                    conn.send({
-                                        type: 'ROOM_SYNC',
-                                        pairCode: this.currentRoomCode,
-                                        firebaseUrl: this.cleanDbUrl(),
-                                        state: appState
-                                    });
-                                }
-                            }, 250);
                         }
                     }
                 });
 
                 conn.on('close', () => {
                     this.activeConns = this.activeConns.filter(c => c !== conn);
-                    if (typeof renderSyncTabState === 'function') renderSyncTabState();
+                    renderSyncTabState();
                 });
+            },
+
+            // Отправка легкого сигнала запроса на подключение (всегда < 500 байт — мгновенно доходит через ntfy и P2P!)
+            async sendJoinRequestSignal(targetCode, requesterProfile) {
+                const cleanCode = String(targetCode || '').trim().toUpperCase();
+                if (!cleanCode || !requesterProfile) return;
+
+                const lightProfile = {
+                    login: requesterProfile.login,
+                    name: requesterProfile.name,
+                    avatar: (requesterProfile.avatar && requesterProfile.avatar.startsWith('data:')) ? '💖' : (requesterProfile.avatar || '💖'),
+                    birthdate: requesterProfile.birthdate || '',
+                    bio: requesterProfile.bio || ''
+                };
+
+                const packet = {
+                    type: 'PAIR_JOIN_REQUEST',
+                    pairCode: cleanCode,
+                    requester: lightProfile,
+                    sentAt: Date.now()
+                };
+
+                // 1. Отправляем по прямому P2P-соединению, если уже открыто
+                this.activeConns.forEach(conn => {
+                    if (conn && conn.open) {
+                        try { conn.send(packet); } catch (e) {}
+                    }
+                });
+
+                // 2. Отправляем через легкий облачный пуш-канал ntfy (размер всего ~250 байт!)
+                try {
+                    await fetch(`https://ntfy.sh/${this.getSignalChannel(cleanCode)}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
+                        body: JSON.stringify(packet)
+                    });
+                } catch (e) {}
+            },
+
+            // Отправка подтверждения согласия обратно партнеру
+            async sendJoinAcceptedSignal(pairCode, hostProfile, acceptedPartnerProfile, anniversaryDate) {
+                const cleanCode = String(pairCode || '').trim().toUpperCase();
+                if (!cleanCode) return;
+
+                const cleanMembers = {};
+                if (hostProfile && hostProfile.login) {
+                    cleanMembers[hostProfile.login] = {
+                        name: hostProfile.name,
+                        avatar: (hostProfile.avatar && hostProfile.avatar.startsWith('data:')) ? '🥰' : (hostProfile.avatar || '🥰'),
+                        birthdate: hostProfile.birthdate || '',
+                        bio: hostProfile.bio || '',
+                        moodEmoji: '☕',
+                        moodText: 'Вместе ❤️'
+                    };
+                }
+                if (acceptedPartnerProfile && acceptedPartnerProfile.login) {
+                    cleanMembers[acceptedPartnerProfile.login] = {
+                        name: acceptedPartnerProfile.name,
+                        avatar: (acceptedPartnerProfile.avatar && acceptedPartnerProfile.avatar.startsWith('data:')) ? '💖' : (acceptedPartnerProfile.avatar || '💖'),
+                        birthdate: acceptedPartnerProfile.birthdate || '',
+                        bio: acceptedPartnerProfile.bio || '',
+                        moodEmoji: '💖',
+                        moodText: 'Вместе ❤️'
+                    };
+                }
+
+                const packet = {
+                    type: 'PAIR_JOIN_ACCEPTED',
+                    pairCode: cleanCode,
+                    anniversaryDate: anniversaryDate || '2026-06-15',
+                    members: cleanMembers,
+                    sentAt: Date.now()
+                };
+
+                try {
+                    await fetch(`https://ntfy.sh/${this.getSignalChannel(cleanCode)}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
+                        body: JSON.stringify(packet)
+                    });
+                } catch (e) {}
             },
 
             async pushRoomState(pairCode, stateObj) {
                 if (!pairCode || !stateObj) return;
                 const cleanCode = String(pairCode).trim().toUpperCase();
 
+                // 1. Передаем полный пакет (с фото и рисунками) по P2P
                 this.activeConns.forEach(conn => {
                     if (conn && conn.open) {
                         try {
                             conn.send({
                                 type: 'ROOM_SYNC',
                                 pairCode: cleanCode,
-                                firebaseUrl: this.cleanDbUrl(),
                                 state: stateObj
                             });
                         } catch (e) {}
                     }
                 });
 
+                // 2. Передаем полный пакет в Firebase DB (если подключена)
                 const baseUrl = this.cleanDbUrl();
                 if (baseUrl) {
                     try {
@@ -1323,11 +1501,45 @@
                         });
                     } catch (e) {}
                 }
+
+                // 3. Также отправляем облегченный слепок метаданных (имена, статусы, продукты, планы) через ntfy (< 3 КБ)
+                try {
+                    const lightMembers = {};
+                    Object.keys(stateObj.members || {}).forEach(k => {
+                        const m = stateObj.members[k];
+                        lightMembers[k] = {
+                            ...m,
+                            avatar: (m.avatar && m.avatar.startsWith('data:')) ? '🥰' : (m.avatar || '🥰')
+                        };
+                    });
+                    const lightPacket = {
+                        type: 'LIGHT_STATE_SYNC',
+                        pairCode: cleanCode,
+                        updatedAt: stateObj.updatedAt || Date.now(),
+                        anniversaryDate: stateObj.anniversaryDate,
+                        partnerLinkedManually: stateObj.partnerLinkedManually,
+                        members: lightMembers,
+                        reminders: (stateObj.reminders || []).slice(0, 10),
+                        notes: (stateObj.notes || []).slice(0, 8),
+                        foodProducts: (stateObj.foodProducts || []).slice(0, 25),
+                        dishChains: (stateObj.dishChains || []).slice(0, 10)
+                    };
+                    const serialized = JSON.stringify(lightPacket);
+                    if (serialized.length < 3800) {
+                        await fetch(`https://ntfy.sh/${this.getSignalChannel(cleanCode)}`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
+                            body: serialized
+                        });
+                    }
+                } catch (e) {}
             },
 
             async fetchRoomState(pairCode) {
                 if (!pairCode) return null;
                 const cleanCode = String(pairCode).trim().toUpperCase();
+
+                // 1. Проверяем Firebase DB, если подключена
                 const baseUrl = this.cleanDbUrl();
                 if (baseUrl) {
                     try {
@@ -1338,6 +1550,40 @@
                         }
                     } catch (e) {}
                 }
+
+                // 2. Проверяем сигнальную очередь ntfy (запросы на вход и легкие пакеты синхронизации)
+                try {
+                    const sigRes = await fetch(`https://ntfy.sh/${this.getSignalChannel(cleanCode)}/json?poll=1&since=48h`, {
+                        cache: 'no-store'
+                    });
+                    if (sigRes.ok) {
+                        const text = await sigRes.text();
+                        const lines = text.trim().split('\n').filter(Boolean);
+                        let latestLightState = null;
+
+                        for (const line of lines) {
+                            try {
+                                const pkt = JSON.parse(line);
+                                if (pkt.event === 'message' && pkt.message) {
+                                    const parsed = JSON.parse(pkt.message);
+                                    if (!parsed || parsed.pairCode !== cleanCode) continue;
+
+                                    if (parsed.type === 'PAIR_JOIN_REQUEST' && parsed.requester) {
+                                        handleIncomingJoinRequestSignal(parsed.requester, cleanCode);
+                                    } else if (parsed.type === 'PAIR_JOIN_ACCEPTED' && parsed.members) {
+                                        handleIncomingAcceptedSignal(parsed);
+                                    } else if (parsed.type === 'LIGHT_STATE_SYNC') {
+                                        if (!latestLightState || (parsed.updatedAt || 0) >= (latestLightState.updatedAt || 0)) {
+                                            latestLightState = parsed;
+                                        }
+                                    }
+                                }
+                            } catch (err) {}
+                        }
+                        if (latestLightState) return latestLightState;
+                    }
+                } catch (e) {}
+
                 return null;
             },
 
@@ -1347,6 +1593,32 @@
 
                 this.onUpdateCallback = onUpdateCallback;
                 this.initPeerBridge(cleanCode, onUpdateCallback);
+
+                if (this.signalEventSource) {
+                    try { this.signalEventSource.close(); } catch (e) {}
+                    this.signalEventSource = null;
+                }
+
+                try {
+                    this.signalEventSource = new EventSource(`https://ntfy.sh/${this.getSignalChannel(cleanCode)}/sse`);
+                    this.signalEventSource.onmessage = (e) => {
+                        try {
+                            const pkt = JSON.parse(e.data);
+                            if (pkt.event === 'message' && pkt.message) {
+                                const parsed = JSON.parse(pkt.message);
+                                if (!parsed || parsed.pairCode !== cleanCode) return;
+
+                                if (parsed.type === 'PAIR_JOIN_REQUEST' && parsed.requester) {
+                                    handleIncomingJoinRequestSignal(parsed.requester, cleanCode);
+                                } else if (parsed.type === 'PAIR_JOIN_ACCEPTED' && parsed.members) {
+                                    handleIncomingAcceptedSignal(parsed);
+                                } else if (parsed.type === 'LIGHT_STATE_SYNC' && this.onUpdateCallback) {
+                                    this.onUpdateCallback(parsed);
+                                }
+                            }
+                        } catch (err) {}
+                    };
+                } catch (e) {}
 
                 if (this.pollTimer) clearInterval(this.pollTimer);
                 this.pollTimer = setInterval(async () => {
@@ -1380,21 +1652,118 @@
             }
         };
 
-        const githubCloudEngine = {
-            token: EMBEDDED_GITHUB_TOKEN || localStorage.getItem('couple_embedded_gh_token') || '',
-            gistId: EMBEDDED_MASTER_GIST_ID || localStorage.getItem('couple_embedded_gist_id') || '',
-            pollTimer: null,
-            isConfigured() { return Boolean(this.token && this.token.trim().length > 10); },
-            async ensureMasterGist() { return this.gistId || null; },
-            async pushRoomState() {},
-            async fetchRoomState() { return null; },
-            async saveAccountToGitHub() {},
-            async fetchAccountFromGitHub() { return null; },
-            startPollingRoom() {}
-        };
+        // ============================================================================
+        // 2. ОБРАБОТКА ВХОДЯЩЕГО ЗАПРОСА НА ПОДКЛЮЧЕНИЕ НА ВТОРОМ УСТРОЙСТВЕ
+        // ============================================================================
+        let pendingJoinRequester = null;
+        let declinedRequesterLogins = {};
+
+        function handleIncomingJoinRequestSignal(requester, roomCode) {
+            if (!currentUser || !appState || !requester || !requester.login) return;
+            // Игнорируем собственный сигнал
+            if (requester.login === currentUser.login) return;
+
+            // Если этот партнер УЖЕ принят в нашей комнате — ничего не спрашиваем повторно
+            if (appState.members && appState.members[requester.login]) {
+                return;
+            }
+            if (declinedRequesterLogins[requester.login]) return;
+
+            pendingJoinRequester = {
+                ...requester,
+                roomCode: roomCode || currentUser.pairCode
+            };
+
+            // Заполняем и открываем красивое модальное окно согласия + баннер в Кабинете
+            const modal = document.getElementById('incomingPairRequestModal');
+            const nameLabel = document.getElementById('incomingPartnerNameLabel');
+            const avatarBox = document.getElementById('incomingPartnerAvatarBox');
+
+            const banner = document.getElementById('cabinetIncomingRequestBanner');
+            const bannerName = document.getElementById('cabinetIncomingName');
+            const bannerAvatar = document.getElementById('cabinetIncomingAvatar');
+
+            if (nameLabel) nameLabel.textContent = requester.name || 'Партнер';
+            if (avatarBox) renderAvatarElement(avatarBox, requester.avatar || '💖');
+
+            if (bannerName) bannerName.textContent = `${requester.name || 'Партнер'} хочет подключиться`;
+            if (bannerAvatar) renderAvatarElement(bannerAvatar, requester.avatar || '💖');
+            if (banner) banner.classList.remove('hidden');
+
+            if (modal) modal.classList.remove('hidden');
+            lucide.createIcons();
+        }
+
+        async function acceptIncomingPartnerRequest() {
+            if (!currentUser || !appState) return;
+            if (!pendingJoinRequester) {
+                document.getElementById('incomingPairRequestModal').classList.add('hidden');
+                return;
+            }
+
+            const partner = pendingJoinRequester;
+            if (!appState.members) appState.members = {};
+
+            // Добавляем принятого партнера в комнату с его настоящим именем
+            appState.members[partner.login] = {
+                name: partner.name || 'Партнер',
+                avatar: partner.avatar || '💖',
+                birthdate: partner.birthdate || '',
+                bio: partner.bio || '',
+                moodEmoji: '💖',
+                moodText: 'Вместе ❤️'
+            };
+            appState.partnerLinkedManually = true;
+
+            document.getElementById('incomingPairRequestModal').classList.add('hidden');
+            const banner = document.getElementById('cabinetIncomingRequestBanner');
+            if (banner) banner.classList.add('hidden');
+
+            pendingJoinRequester = null;
+
+            saveRoomLocally(true);
+            await instantRelayCloud.sendJoinAcceptedSignal(
+                currentUser.pairCode,
+                currentUser,
+                partner,
+                appState.anniversaryDate
+            );
+
+            renderAll();
+            showToast(`Вы приняли запрос от ${partner.name}! Пара связана ❤️`);
+        }
+
+        function declineIncomingPartnerRequest() {
+            if (pendingJoinRequester && pendingJoinRequester.login) {
+                declinedRequesterLogins[pendingJoinRequester.login] = true;
+            }
+            pendingJoinRequester = null;
+            document.getElementById('incomingPairRequestModal').classList.add('hidden');
+            const banner = document.getElementById('cabinetIncomingRequestBanner');
+            if (banner) banner.classList.add('hidden');
+            showToast('Запрос скрыт');
+        }
+
+        function handleIncomingAcceptedSignal(acceptedPacket) {
+            if (!currentUser || !appState || !acceptedPacket || !acceptedPacket.members) return;
+            appState.members = {
+                ...(appState.members || {}),
+                ...acceptedPacket.members
+            };
+            // Сохраняем свою локальную фото-аватарку, если она была в base64
+            if (appState.members[currentUser.login] && currentUser.avatar) {
+                appState.members[currentUser.login].avatar = currentUser.avatar;
+            }
+            appState.partnerLinkedManually = true;
+            if (acceptedPacket.anniversaryDate) {
+                appState.anniversaryDate = acceptedPacket.anniversaryDate;
+            }
+            saveRoomLocally(false);
+            renderAll();
+        }
 
         // ============================================================================
-        // 2. КОНСТАНТЫ И СОСТОЯНИЕ ПРИЛОЖЕНИЯ
+        // 3. СОСТОЯНИЕ ПРИЛОЖЕНИЯ, ЗАЩИТА БД (SHA-256) И КАЛЕНДАРЬ ФОТО ДНЯ
         // ============================================================================
         const STORAGE_KEY_ACCOUNTS = 'couple_space_accounts_db_v3';
         const STORAGE_KEY_SESSION = 'couple_space_active_session_v3';
@@ -1435,6 +1804,51 @@
             return code;
         }
 
+        function renderAvatarElement(el, avatarVal) {
+            if (!el) return;
+            const val = avatarVal || '🥰';
+            if (typeof val === 'string' && val.startsWith('data:image')) {
+                el.innerHTML = `<img src="${val}" alt="Аватар" class="w-full h-full object-cover">`;
+            } else {
+                el.innerHTML = '';
+                el.textContent = val;
+            }
+        }
+
+        // Партнер считается подключенным ТОЛЬКО когда в комнате реально есть второй участник
+        function isPartnerConnected() {
+            if (!appState || !currentUser) return false;
+            const memberLogins = Object.keys(appState.members || {});
+            return memberLogins.some(loginKey => loginKey !== currentUser.login);
+        }
+
+        const DEFAULT_FOOD_PRODUCTS = [
+            { id: 'prd-1', name: 'Спагетти', emoji: '🍝', inStock: true, priority: 'essential' },
+            { id: 'prd-2', name: 'Бекон', emoji: '🥓', inStock: false, priority: 'essential' },
+            { id: 'prd-3', name: 'Сливки 20%', emoji: '🥛', inStock: false, priority: 'essential' },
+            { id: 'prd-4', name: 'Пармезан', emoji: '🧀', inStock: true, priority: 'essential' },
+            { id: 'prd-5', name: 'Яйца', emoji: '🥚', inStock: true, priority: 'essential' },
+            { id: 'prd-6', name: 'Творог', emoji: '🍚', inStock: true, priority: 'essential' },
+            { id: 'prd-7', name: 'Клубника', emoji: '🍓', inStock: false, priority: 'optional' },
+            { id: 'prd-8', name: 'Шоколад', emoji: '🍫', inStock: false, priority: 'optional' },
+            { id: 'prd-9', name: 'Авокадо', emoji: '🥑', inStock: false, priority: 'optional' }
+        ];
+
+        const DEFAULT_DISH_CHAINS = [
+            {
+                id: 'dish-1',
+                title: 'Паста Карбонара',
+                emoji: '🍝',
+                productIds: ['prd-1', 'prd-2', 'prd-3', 'prd-4', 'prd-5']
+            },
+            {
+                id: 'dish-2',
+                title: 'Утренние сырники с ягодами',
+                emoji: '🥞',
+                productIds: ['prd-6', 'prd-5', 'prd-7']
+            }
+        ];
+
         let currentUser = null;
         let authMode = 'login';
         let registerAvatar = '🥰';
@@ -1460,23 +1874,6 @@
         let activeDayModalDateKey = null;
         let pendingDayModalPhoto = null;
 
-        const DEFAULT_FOOD_PRODUCTS = [
-            { id: 'prd-1', name: 'Спагетти', emoji: '🍝', inStock: true, priority: 'essential' },
-            { id: 'prd-2', name: 'Бекон', emoji: '🥓', inStock: false, priority: 'essential' },
-            { id: 'prd-3', name: 'Сливки 20%', emoji: '🥛', inStock: false, priority: 'essential' },
-            { id: 'prd-4', name: 'Пармезан', emoji: '🧀', inStock: true, priority: 'essential' },
-            { id: 'prd-5', name: 'Яйца', emoji: '🥚', inStock: true, priority: 'essential' },
-            { id: 'prd-6', name: 'Творог', emoji: '🍚', inStock: true, priority: 'essential' },
-            { id: 'prd-7', name: 'Клубника', emoji: '🍓', inStock: false, priority: 'optional' },
-            { id: 'prd-8', name: 'Шоколад', emoji: '🍫', inStock: false, priority: 'optional' },
-            { id: 'prd-9', name: 'Авокадо', emoji: '🥑', inStock: false, priority: 'optional' }
-        ];
-
-        const DEFAULT_DISH_CHAINS = [
-            { id: 'dish-1', title: 'Паста Карбонара', emoji: '🍝', productIds: ['prd-1', 'prd-2', 'prd-3', 'prd-4', 'prd-5'] },
-            { id: 'dish-2', title: 'Утренние сырники с ягодами', emoji: '🥞', productIds: ['prd-6', 'prd-5', 'prd-7'] }
-        ];
-
         function formatDateKey(dateObj) {
             const y = dateObj.getFullYear();
             const m = String(dateObj.getMonth() + 1).padStart(2, '0');
@@ -1489,64 +1886,112 @@
         }
 
         function formatHumanDate(dateKey) {
-            if (!dateKey || typeof dateKey !== 'string') return '';
-            const parts = dateKey.split('-');
+            const parts = String(dateKey || '').split('-');
             if (parts.length !== 3) return dateKey;
             const d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
             return d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
         }
 
-        function renderAvatarElement(el, avatarVal) {
-            if (!el) return;
-            const val = avatarVal || '🥰';
-            if (typeof val === 'string' && val.startsWith('data:image')) {
-                el.innerHTML = `<img src="${val}" alt="Аватар" class="w-full h-full object-cover">`;
-            } else {
-                el.innerHTML = '';
-                el.textContent = val;
-            }
-        }
-
-        // Партнер считается подключенным, когда в комнате есть второй участник с настоящим именем
-        function isPartnerConnected() {
-            if (!appState || !currentUser) return false;
-            const memberLogins = Object.keys(appState.members || {});
-            const hasSecondMember = memberLogins.some(loginKey => loginKey !== currentUser.login);
-            return Boolean(hasSecondMember);
-        }
-
         function createInitialSampleDrawing() {
             const c = document.createElement('canvas');
-            c.width = 480;
-            c.height = 480;
+            c.width = 400;
+            c.height = 400;
             const ctx = c.getContext('2d');
+
             ctx.fillStyle = '#FFFDF9';
-            ctx.fillRect(0, 0, 480, 480);
+            ctx.fillRect(0, 0, 400, 400);
+
             ctx.fillStyle = '#FFF5F2';
             ctx.beginPath();
-            ctx.arc(240, 220, 135, 0, Math.PI * 2);
+            ctx.arc(200, 185, 110, 0, Math.PI * 2);
             ctx.fill();
+
             ctx.strokeStyle = '#E06D53';
-            ctx.lineWidth = 10;
+            ctx.lineWidth = 9;
             ctx.lineCap = 'round';
             ctx.lineJoin = 'round';
             ctx.beginPath();
-            ctx.moveTo(240, 290);
-            ctx.bezierCurveTo(150, 230, 145, 145, 205, 145);
-            ctx.bezierCurveTo(230, 145, 240, 170, 240, 175);
-            ctx.bezierCurveTo(240, 170, 250, 145, 275, 145);
-            ctx.bezierCurveTo(335, 145, 330, 230, 240, 290);
+            ctx.moveTo(200, 245);
+            ctx.bezierCurveTo(125, 195, 120, 120, 170, 120);
+            ctx.bezierCurveTo(192, 120, 200, 142, 200, 148);
+            ctx.bezierCurveTo(200, 142, 208, 120, 230, 120);
+            ctx.bezierCurveTo(280, 120, 275, 195, 200, 245);
             ctx.stroke();
+
             ctx.fillStyle = '#1E293B';
-            ctx.font = 'bold 22px Inter, sans-serif';
+            ctx.font = 'bold 19px Inter, sans-serif';
             ctx.textAlign = 'center';
-            ctx.fillText('Наше Пространство ✨', 240, 385);
-            return c.toDataURL('image/jpeg', 0.85);
+            ctx.fillText('Наше Пространство ✨', 200, 330);
+
+            return c.toDataURL('image/jpeg', 0.8);
+        }
+
+        function createSampleMomentImage(bgTop, bgBottom, labelText, emojiIcon) {
+            const c = document.createElement('canvas');
+            c.width = 400;
+            c.height = 400;
+            const ctx = c.getContext('2d');
+
+            const grad = ctx.createLinearGradient(0, 0, 400, 400);
+            grad.addColorStop(0, bgTop || '#F0F4FA');
+            grad.addColorStop(1, bgBottom || '#DCE6F5');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, 400, 400);
+
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.75)';
+            ctx.beginPath();
+            ctx.arc(200, 175, 80, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.font = '64px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(emojiIcon || '💖', 200, 180);
+
+            ctx.fillStyle = '#1E293B';
+            ctx.font = 'bold 18px Inter, sans-serif';
+            ctx.fillText(labelText || 'Теплый день', 200, 310);
+
+            return c.toDataURL('image/jpeg', 0.8);
         }
 
         function createDefaultRoomState(creatorUser) {
             const sampleImg = createInitialSampleDrawing();
             const today = new Date();
+            const d1 = new Date(today.getFullYear(), today.getMonth(), Math.max(1, today.getDate() - 2));
+            const d2 = new Date(today.getFullYear(), today.getMonth(), Math.max(1, today.getDate() - 1));
+            const key1 = formatDateKey(d1);
+            const key2 = formatDateKey(d2);
+
+            const dailyPhotosMap = {};
+            if (key1 !== formatDateKey(today)) {
+                dailyPhotosMap[key1] = {
+                    imageData: createSampleMomentImage('#F0F4FA', '#DCE6F5', 'Уютный вечер вдвоем ☕', '☕'),
+                    caption: 'Гуляли по вечернему городу и пили какао',
+                    author: creatorUser ? creatorUser.name : 'Партнер',
+                    updatedAt: Date.now() - 86400000 * 2,
+                    drawingsHistory: [
+                        {
+                            id: 'drw-sample-1',
+                            type: 'draw',
+                            imageData: sampleImg,
+                            caption: 'Первый рисунок в дневнике ✨',
+                            author: creatorUser ? creatorUser.name : 'Партнер',
+                            time: '20:15'
+                        }
+                    ]
+                };
+            }
+            if (key2 !== formatDateKey(today)) {
+                dailyPhotosMap[key2] = {
+                    imageData: createSampleMomentImage('#FFF5F2', '#FFE6DF', 'Наш теплый день ✨', '🌅'),
+                    caption: 'Красивый закат по дороге домой',
+                    author: creatorUser ? creatorUser.name : 'Партнер',
+                    updatedAt: Date.now() - 86400000,
+                    drawingsHistory: []
+                };
+            }
+
             return {
                 updatedAt: Date.now(),
                 pairCode: creatorUser ? creatorUser.pairCode : generatePairCode(),
@@ -1570,7 +2015,7 @@
                     moodEmoji: '⏳',
                     moodText: 'Ожидает подключения по коду'
                 },
-                dailyPhotos: {},
+                dailyPhotos: dailyPhotosMap,
                 locketFeed: [
                     {
                         id: 'lck-initial',
@@ -1585,14 +2030,15 @@
                 ],
                 memories: [],
                 reminders: [
-                    { id: 'rem-1', title: 'Вечерняя прогулка и кофе', date: getTodayDateKey(), time: '19:30', done: false }
+                    { id: 'rem-1', title: 'Вечерняя прогулка и кофе', date: getTodayDateKey(), time: '19:30', done: false },
+                    { id: 'rem-2', title: 'Посмотреть новый фильм вместе', date: getTodayDateKey(), time: '21:00', done: false }
                 ],
                 notes: [
                     {
                         id: 'note-1',
                         title: 'Идеи для уютных выходных',
                         category: 'Идеи',
-                        content: '1. Приготовить пасту вместе\n2. Сходить в кино\n3. Сделать вечер настольных игр',
+                        content: '1. Приготовить пасту вместе\n2. Сходить в ботанический сад\n3. Сделать вечер настольных игр',
                         author: creatorUser ? creatorUser.name : 'Партнер'
                     }
                 ],
@@ -1600,6 +2046,95 @@
                 dishChains: [...DEFAULT_DISH_CHAINS]
             };
         }
+
+        // Умное объединение приходящих из облака или P2P данных комнаты
+        function applyRemoteRoomUpdate(remoteState) {
+            if (!remoteState || !currentUser) return;
+
+            // Проверяем, не стучится ли к нам новый партнер, которого мы еще не подтвердили
+            const incomingLogins = Object.keys(remoteState.members || {}).filter(k => k !== currentUser.login);
+            const alreadyConnected = isPartnerConnected();
+
+            if (!alreadyConnected && incomingLogins.length > 0 && !remoteState.partnerLinkedManually) {
+                const newcomerLogin = incomingLogins[0];
+                const newcomerObj = remoteState.members[newcomerLogin];
+                handleIncomingJoinRequestSignal({ login: newcomerLogin, ...newcomerObj }, currentUser.pairCode);
+                return;
+            }
+
+            const prevMembersCount = Object.keys((appState && appState.members) || {}).length;
+            const mergedMembers = {
+                ...((appState && appState.members) || {}),
+                ...(remoteState.members || {})
+            };
+
+            const myPrev = mergedMembers[currentUser.login] || {};
+            mergedMembers[currentUser.login] = {
+                name: currentUser.name,
+                avatar: currentUser.avatar || myPrev.avatar || '🥰',
+                birthdate: currentUser.birthdate || myPrev.birthdate || '',
+                bio: currentUser.bio || myPrev.bio || '',
+                moodEmoji: myPrev.moodEmoji || '☕',
+                moodText: myPrev.moodText || 'На связи!'
+            };
+
+            const remoteNewer = !appState || (remoteState.updatedAt || 0) >= (appState.updatedAt || 0);
+            const newMembersCount = Object.keys(mergedMembers).length;
+
+            if (remoteNewer || newMembersCount > prevMembersCount) {
+                appState = {
+                    ...(appState || {}),
+                    ...remoteState,
+                    pairCode: currentUser.pairCode,
+                    members: mergedMembers,
+                    dailyPhotos: { ...((appState && appState.dailyPhotos) || {}), ...(remoteState.dailyPhotos || {}) },
+                    locketFeed: (remoteState.locketFeed && remoteState.locketFeed.length > 0) ? remoteState.locketFeed : ((appState && appState.locketFeed) || []),
+                    memories: (remoteState.memories && remoteState.memories.length > 0) ? remoteState.memories : ((appState && appState.memories) || [])
+                };
+                ensureAppStateIntegrity();
+                saveRoomLocally(false);
+                renderAll();
+            }
+        }
+
+        async function manualForceSync() {
+            if (!currentUser || !currentUser.pairCode) return;
+            showToast('Проверяем запросы и обновления...');
+            const remote = await instantRelayCloud.fetchRoomState(currentUser.pairCode);
+            if (remote) {
+                applyRemoteRoomUpdate(remote);
+            } else {
+                saveRoomLocally(true);
+            }
+        }
+
+        // ============================================================================
+        // 4. ИНИЦИАЛИЗАЦИЯ, ВАЛИДАЦИЯ И АВТОРИЗАЦИЯ
+        // ============================================================================
+        window.onload = function () {
+            initDrawingCanvas();
+            const remDateEl = document.getElementById('reminderDateInput');
+            if (remDateEl) remDateEl.value = getTodayDateKey();
+            checkActiveSession();
+            lucide.createIcons();
+
+            window.addEventListener('storage', (e) => {
+                if (currentUser && e.key === STORAGE_KEY_ROOMS_PREFIX + currentUser.pairCode && e.newValue) {
+                    try {
+                        const parsed = JSON.parse(e.newValue);
+                        applyRemoteRoomUpdate(parsed);
+                    } catch (err) {}
+                }
+            });
+        };
+
+        window.onCloudBridgeReady = function () {
+            if (currentUser && currentUser.pairCode) {
+                window.cloudSyncBridge.subscribeCoupleRoom(currentUser.pairCode, (remoteState) => {
+                    applyRemoteRoomUpdate(remoteState);
+                });
+            }
+        };
 
         function getLocalAccountsDB() {
             try {
@@ -1656,6 +2191,9 @@
             if (!file) return;
             compressImageFileToSquare(file, (compressedDataUrl) => {
                 registerAvatar = compressedDataUrl;
+                document.querySelectorAll('.avatar-pick-btn').forEach(b => {
+                    b.className = 'avatar-pick-btn text-xl p-2 rounded-2xl bg-slate-50 border border-slate-200 transition';
+                });
                 renderAvatarElement(document.getElementById('authAvatarPreviewBox'), registerAvatar);
                 showToast('Фото для аватарки выбрано ✓');
             });
@@ -1704,11 +2242,11 @@
             const password = document.getElementById('authPasswordInput').value.trim();
 
             if (!LOGIN_REGEX.test(loginRaw)) {
-                showToast('Логин: минимум 5 символов, только латиница и цифры', 'error');
+                showToast('Логин: минимум 5 символов, только латинские буквы и цифры', 'error');
                 return;
             }
             if (!PASSWORD_REGEX.test(password)) {
-                showToast('Пароль: минимум 8 символов, только латиница и цифры', 'error');
+                showToast('Пароль: минимум 8 символов, только латинские буквы и цифры', 'error');
                 return;
             }
             if (loginRaw.toLowerCase() === password.toLowerCase()) {
@@ -1725,12 +2263,17 @@
                 const partnerCodeInput = document.getElementById('authPartnerCodeInput').value.trim().toUpperCase();
 
                 if (partnerCodeInput && !PAIR_CODE_REGEX.test(partnerCodeInput)) {
-                    showToast('Код партнера должен состоять ровно из 10 символов', 'error');
+                    showToast('Код комнаты партнера должен состоять ровно из 10 латинских букв/цифр', 'error');
                     return;
                 }
 
                 let existingAcc = accountsDB[loginKey];
-                if (!existingAcc) existingAcc = await instantRelayCloud.fetchAccountFromCloud(loginKey);
+                if (!existingAcc && window.cloudSyncBridge && window.cloudSyncBridge.ready) {
+                    existingAcc = await window.cloudSyncBridge.fetchUserAccount(loginKey);
+                }
+                if (!existingAcc) {
+                    existingAcc = await instantRelayCloud.fetchAccountFromCloud(loginKey);
+                }
                 if (existingAcc) {
                     showToast('Такой логин уже занят — переключитесь на «Вход»', 'error');
                     return;
@@ -1751,22 +2294,36 @@
                 accountsDB[loginKey] = newAccount;
                 saveLocalAccountsDB(accountsDB);
                 instantRelayCloud.saveAccountToCloud(loginKey, newAccount);
+                if (window.cloudSyncBridge) {
+                    await window.cloudSyncBridge.saveUserAccount(loginKey, newAccount);
+                }
 
                 await loginIntoSession(newAccount);
+                if (partnerCodeInput) {
+                    await instantRelayCloud.sendJoinRequestSignal(partnerCodeInput, newAccount);
+                }
                 showToast(`Аккаунт ${displayName} создан!`);
             } else {
                 let account = accountsDB[loginKey];
-                if (!account) account = await instantRelayCloud.fetchAccountFromCloud(loginKey);
+                if (!account && window.cloudSyncBridge && window.cloudSyncBridge.ready) {
+                    account = await window.cloudSyncBridge.fetchUserAccount(loginKey);
+                }
+                if (!account) {
+                    account = await instantRelayCloud.fetchAccountFromCloud(loginKey);
+                }
                 if (account) {
                     accountsDB[loginKey] = account;
                     saveLocalAccountsDB(accountsDB);
                 }
 
                 if (!account) {
-                    showToast('Аккаунт не найден. Переключитесь на «Регистрация»!', 'error');
+                    showToast('Аккаунт не найден. Переключитесь на вкладку «Регистрация»!', 'error');
                     return;
                 }
-                const isPassValid = account.passwordHash ? account.passwordHash === passwordHash : account.password === password;
+                const isPassValid = account.passwordHash
+                    ? account.passwordHash === passwordHash
+                    : account.password === password;
+
                 if (!isPassValid) {
                     showToast('Неверный пароль', 'error');
                     return;
@@ -1774,71 +2331,6 @@
 
                 await loginIntoSession(account);
                 showToast(`С возвращением, ${account.name}!`);
-            }
-        }
-
-        window.onload = function () {
-            initDrawingCanvas();
-            const remDateEl = document.getElementById('reminderDateInput');
-            if (remDateEl) remDateEl.value = getTodayDateKey();
-            checkActiveSession();
-            lucide.createIcons();
-
-            window.addEventListener('storage', (e) => {
-                if (currentUser && e.key === STORAGE_KEY_ROOMS_PREFIX + currentUser.pairCode && e.newValue) {
-                    try {
-                        applyRemoteRoomUpdate(JSON.parse(e.newValue));
-                    } catch (err) {}
-                }
-            });
-        };
-
-        function applyRemoteRoomUpdate(remoteState) {
-            if (!remoteState || !currentUser) return;
-            const prevMembersCount = Object.keys((appState && appState.members) || {}).length;
-            const mergedMembers = {
-                ...((appState && appState.members) || {}),
-                ...(remoteState.members || {})
-            };
-
-            const myPrev = mergedMembers[currentUser.login] || {};
-            mergedMembers[currentUser.login] = {
-                name: currentUser.name,
-                avatar: currentUser.avatar || myPrev.avatar || '🥰',
-                birthdate: currentUser.birthdate || myPrev.birthdate || '',
-                bio: currentUser.bio || myPrev.bio || '',
-                moodEmoji: myPrev.moodEmoji || '☕',
-                moodText: myPrev.moodText || 'На связи!'
-            };
-
-            const remoteNewer = !appState || (remoteState.updatedAt || 0) >= (appState.updatedAt || 0);
-            const newMembersCount = Object.keys(mergedMembers).length;
-
-            if (remoteNewer || newMembersCount > prevMembersCount) {
-                appState = {
-                    ...(appState || {}),
-                    ...remoteState,
-                    pairCode: currentUser.pairCode,
-                    members: mergedMembers
-                };
-                ensureAppStateIntegrity();
-                saveRoomLocally(false);
-                renderAll();
-
-                if (!remoteState.members || !remoteState.members[currentUser.login]) {
-                    saveRoomLocally(true);
-                }
-            }
-        }
-
-        async function manualForceSync() {
-            if (!currentUser || !currentUser.pairCode) return;
-            showToast('Синхронизация с партнером...');
-            const remote = await instantRelayCloud.fetchRoomState(currentUser.pairCode);
-            if (remote) {
-                applyRemoteRoomUpdate(remote);
-            } else {
-                saveRoomLocally(true);
             }
         }
 
@@ -1853,6 +2345,7 @@
                     }
                 }
             } catch (e) {}
+
             document.getElementById('authScreen').classList.remove('hidden');
         }
 
@@ -1895,6 +2388,12 @@
                 applyRemoteRoomUpdate(cloudRoom);
             } else {
                 saveRoomLocally(true);
+            }
+
+            if (window.cloudSyncBridge && window.cloudSyncBridge.ready) {
+                window.cloudSyncBridge.subscribeCoupleRoom(currentUser.pairCode, (remoteState) => {
+                    applyRemoteRoomUpdate(remoteState);
+                });
             }
         }
 
@@ -1980,14 +2479,24 @@
             const roomKey = STORAGE_KEY_ROOMS_PREFIX + currentUser.pairCode;
             try {
                 localStorage.setItem(roomKey, JSON.stringify(appState));
-            } catch (e) {}
+            } catch (e) {
+                showToast('Память заполнена, очистите старые снимки', 'error');
+            }
             if (pushCloud) {
                 instantRelayCloud.pushRoomState(currentUser.pairCode, appState);
+                if (window.cloudSyncBridge) {
+                    window.cloudSyncBridge.pushCoupleRoom(currentUser.pairCode, appState);
+                }
             }
         }
 
+        // ============================================================================
+        // 5. ПОЛУЧЕНИЕ ДАННЫХ ТЕКУЩЕГО ПОЛЬЗОВАТЕЛЯ И ВТОРОЙ ПОЛОВИНКИ
+        // ============================================================================
         function getMyMemberProfile() {
-            if (!currentUser || !appState) return { name: 'Я', avatar: '🥰', moodEmoji: '☕', moodText: 'На связи' };
+            if (!currentUser || !appState) {
+                return { name: 'Я', avatar: '🥰', moodEmoji: '☕', moodText: 'На связи' };
+            }
             if (!appState.members[currentUser.login]) {
                 appState.members[currentUser.login] = {
                     name: currentUser.name,
@@ -1999,22 +2508,23 @@
             return appState.members[currentUser.login];
         }
 
-        // Возвращает профиль реального партнера из комнаты
         function getPartnerMemberProfile() {
-            if (!appState) return { name: 'Партнер не подключен', avatar: '🤍', moodEmoji: '⏳', moodText: 'Ожидает подключения' };
+            if (!appState) return { name: 'Партнер', avatar: '💖', moodEmoji: '💖', moodText: 'Скучаю!' };
             const myLogin = currentUser ? currentUser.login : '';
             const otherKeys = Object.keys(appState.members || {}).filter(k => k !== myLogin);
             if (otherKeys.length > 0) {
-                const partnerObj = appState.members[otherKeys[0]];
-                if (partnerObj && partnerObj.name) {
-                    return partnerObj;
-                }
+                return appState.members[otherKeys[0]];
             }
-            return appState.fallbackPartner || { name: 'Партнер не подключен', avatar: '🤍', moodEmoji: '⏳', moodText: 'Ожидает подключения' };
+            return appState.fallbackPartner;
         }
 
-        function getMyName() { return getMyMemberProfile().name; }
+        function getMyName() {
+            return getMyMemberProfile().name;
+        }
 
+        // ============================================================================
+        // 6. ОТРИСОВКА ИНТЕРФЕЙСА (RENDER ALL)
+        // ============================================================================
         function renderAll() {
             if (!currentUser || !appState) return;
             renderHeaderAndCounter();
@@ -2041,7 +2551,7 @@
 
             if (connected) {
                 document.getElementById('headerCoupleNames').textContent = `${me.name} & ${partner.name}`;
-                document.getElementById('syncStatusText').textContent = `Партнер: ${partner.name} • На связи`;
+                document.getElementById('syncStatusText').textContent = 'Пара подключена • Синхронизация активна';
                 dotEl.className = 'w-2 h-2 rounded-full bg-emerald-500 shrink-0';
 
                 daysBtn.classList.remove('hidden');
@@ -2053,16 +2563,19 @@
                 const totalDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
 
                 document.getElementById('daysCounterBadge').textContent = `${totalDays} ${pluralizeDays(totalDays)}`;
+
                 const months = Math.floor(totalDays / 30);
                 const remDays = totalDays % 30;
                 const hours = now.getHours();
                 document.getElementById('modalTotalDays').textContent = `${totalDays} ${pluralizeDays(totalDays)}`;
-                document.getElementById('modalDetailedBreakdown').textContent = `${months} мес., ${remDays} дн. и ${hours} ч. вашей истории`;
+                document.getElementById('modalDetailedBreakdown').textContent =
+                    `${months} мес., ${remDays} дн. и ${hours} ч. вашей общей истории`;
                 document.getElementById('anniversaryDateInput').value = appState.anniversaryDate;
             } else {
                 document.getElementById('headerCoupleNames').textContent = me.name;
                 document.getElementById('syncStatusText').textContent = 'Партнер еще не подключен';
                 dotEl.className = 'w-2 h-2 rounded-full bg-amber-400 shrink-0';
+
                 daysBtn.classList.add('hidden');
                 connectBtn.classList.remove('hidden');
             }
@@ -2090,22 +2603,29 @@
             return 'дней';
         }
 
+        // ============================================================================
+        // 7. ЕЖЕДНЕВНЫЙ ЗАПРОС ФОТО ДНЯ И ФОТО-КАЛЕНДАРЬ
+        // ============================================================================
         function renderDailyPhotoPrompt() {
             const todayKey = getTodayDateKey();
             const todayEntry = appState.dailyPhotos[todayKey];
-            document.getElementById('dailyPromptDateLabel').textContent = formatHumanDate(todayKey);
+            const dateLabel = document.getElementById('dailyPromptDateLabel');
             const titleEl = document.getElementById('dailyPromptTitle');
             const subEl = document.getElementById('dailyPromptSubtitle');
             const donePreview = document.getElementById('dailyPhotoDonePreview');
             const actionBtns = document.getElementById('dailyPhotoActionBtns');
+
+            dateLabel.textContent = formatHumanDate(todayKey);
 
             if (todayEntry && todayEntry.imageData) {
                 titleEl.textContent = 'Фото сегодняшнего дня в календаре ✨';
                 subEl.classList.add('hidden');
                 donePreview.classList.remove('hidden');
                 actionBtns.classList.add('hidden');
+
                 document.getElementById('dailyPhotoDoneImg').src = todayEntry.imageData;
-                document.getElementById('dailyPhotoDoneCaption').textContent = todayEntry.caption || 'Без подписи';
+                document.getElementById('dailyPhotoDoneCaption').textContent =
+                    todayEntry.caption || 'Без подписи (нажмите «Изменить», чтобы подписать день)';
             } else {
                 titleEl.textContent = 'Сохраните фото сегодняшнего дня!';
                 subEl.classList.remove('hidden');
@@ -2139,8 +2659,13 @@
 
         function changeCalendarMonth(delta) {
             calendarViewMonth += delta;
-            if (calendarViewMonth < 0) { calendarViewMonth = 11; calendarViewYear--; }
-            else if (calendarViewMonth > 11) { calendarViewMonth = 0; calendarViewYear++; }
+            if (calendarViewMonth < 0) {
+                calendarViewMonth = 11;
+                calendarViewYear--;
+            } else if (calendarViewMonth > 11) {
+                calendarViewMonth = 0;
+                calendarViewYear++;
+            }
             renderPhotoCalendar();
             lucide.createIcons();
         }
@@ -2159,7 +2684,8 @@
             grid.innerHTML = '';
 
             const monthDate = new Date(calendarViewYear, calendarViewMonth, 1);
-            document.getElementById('calendarMonthTitle').textContent = monthDate.toLocaleDateString('ru-RU', { month: 'long', year: 'numeric' });
+            const monthTitle = monthDate.toLocaleDateString('ru-RU', { month: 'long', year: 'numeric' });
+            document.getElementById('calendarMonthTitle').textContent = monthTitle;
 
             const firstWeekday = (monthDate.getDay() + 6) % 7;
             const daysInMonth = new Date(calendarViewYear, calendarViewMonth + 1, 0).getDate();
@@ -2194,22 +2720,35 @@
                         <div class="absolute inset-0 bg-gradient-to-t from-slate-900/65 via-transparent to-transparent"></div>
                         <span class="absolute top-1 left-1.5 text-[9px] font-extrabold text-white bg-slate-900/50 backdrop-blur-sm px-1.5 py-0.5 rounded-md leading-none">${day}</span>
                         ${drawingsCount > 0 ? `<span class="absolute bottom-1 left-1 text-[8px] font-bold bg-brand-500/90 text-white px-1 rounded">🎨${drawingsCount}</span>` : ''}
+                        ${entry.caption ? '<span class="absolute bottom-1 right-1 w-2 h-2 rounded-full bg-warm-500 ring-2 ring-white" title="Есть подпись дня"></span>' : ''}
                     `;
                 } else {
                     cell.className = `relative aspect-square rounded-2xl flex flex-col items-center justify-center border transition active:scale-95 ${
-                        isToday ? 'bg-warm-50 border-warm-500 text-warm-600 font-extrabold shadow-sm' : 'bg-slate-50/90 hover:bg-brand-50/60 border-slate-200/70 text-slate-600 font-semibold'
+                        isToday
+                            ? 'bg-warm-50 border-warm-500 text-warm-600 font-extrabold shadow-sm'
+                            : 'bg-slate-50/90 hover:bg-brand-50/60 border-slate-200/70 text-slate-600 font-semibold'
                     }`;
-                    cell.innerHTML = `<span class="text-xs leading-none">${day}</span>${isToday ? '<span class="text-[8px] uppercase font-bold text-warm-500 mt-0.5">Сегодня</span>' : '<span class="text-[9px] text-slate-300 mt-0.5">+</span>'}`;
+                    cell.innerHTML = `
+                        <span class="text-xs leading-none">${day}</span>
+                        ${isToday ? '<span class="text-[8px] uppercase font-bold text-warm-500 mt-0.5">Сегодня</span>' : '<span class="text-[9px] text-slate-300 mt-0.5">+</span>'}
+                    `;
                 }
+
                 grid.appendChild(cell);
             }
 
-            document.getElementById('calendarStatsText').textContent = `Фотографий в этом месяце: ${filledDaysCount} из ${daysInMonth}`;
+            document.getElementById('calendarStatsText').textContent =
+                `Фотографий в этом месяце: ${filledDaysCount} из ${daysInMonth}`;
 
             const storiesList = document.getElementById('calendarMonthStoriesList');
             storiesList.innerHTML = '';
+
             if (monthEntries.length === 0) {
-                storiesList.innerHTML = `<div class="bg-white rounded-2xl p-4 text-center border border-slate-100 text-xs text-slate-400">В этом месяце пока нет сохраненных фото дней.</div>`;
+                storiesList.innerHTML = `
+                    <div class="bg-white rounded-2xl p-4 text-center border border-slate-100 text-xs text-slate-400">
+                        В этом месяце пока нет сохраненных фото дней. Нажмите на любую дату в календаре выше!
+                    </div>
+                `;
             } else {
                 monthEntries.sort((a, b) => b.dateKey.localeCompare(a.dateKey)).forEach(item => {
                     const row = document.createElement('div');
@@ -2222,8 +2761,9 @@
                                 <span class="text-xs font-bold text-slate-900">${formatHumanDate(item.dateKey)}</span>
                                 <span class="text-[10px] text-slate-400 font-medium">${escapeHtml(item.author || '')}</span>
                             </div>
-                            <p class="text-xs text-slate-600 mt-0.5 line-clamp-2">${escapeHtml(item.caption || 'Без подписи...')}</p>
+                            <p class="text-xs text-slate-600 mt-0.5 line-clamp-2">${escapeHtml(item.caption || 'Нажмите, чтобы добавить подпись к этому дню...')}</p>
                         </div>
+                        <i data-lucide="edit-2" class="w-4 h-4 text-slate-300 shrink-0"></i>
                     `;
                     storiesList.appendChild(row);
                 });
@@ -2238,25 +2778,42 @@
             drawGrid.innerHTML = '';
 
             const allDayDrawings = [];
-            Object.keys(appState.dailyPhotos || {}).sort((a, b) => b.localeCompare(a)).forEach(dateKey => {
-                const dayObj = appState.dailyPhotos[dateKey];
-                if (dayObj && Array.isArray(dayObj.drawingsHistory)) {
-                    dayObj.drawingsHistory.forEach(drw => allDayDrawings.push({ dateKey, ...drw }));
-                }
-            });
+            Object.keys(appState.dailyPhotos || {})
+                .sort((a, b) => b.localeCompare(a))
+                .forEach(dateKey => {
+                    const dayObj = appState.dailyPhotos[dateKey];
+                    if (dayObj && Array.isArray(dayObj.drawingsHistory)) {
+                        dayObj.drawingsHistory.forEach(drw => {
+                            allDayDrawings.push({ dateKey, ...drw });
+                        });
+                    }
+                });
 
             (appState.locketFeed || []).forEach(item => {
                 if (item.type === 'draw') {
                     const dk = item.dateKey || getTodayDateKey();
-                    if (!allDayDrawings.some(d => d.imageData === item.imageData)) {
-                        allDayDrawings.push({ dateKey: dk, id: item.id, type: 'draw', imageData: item.imageData, caption: item.caption || 'Рисунок', author: item.sender || 'Партнер' });
+                    const exists = allDayDrawings.some(d => d.imageData === item.imageData);
+                    if (!exists) {
+                        allDayDrawings.push({
+                            dateKey: dk,
+                            id: item.id,
+                            type: 'draw',
+                            imageData: item.imageData,
+                            caption: item.caption || 'Рисунок',
+                            author: item.sender || 'Партнер',
+                            time: item.createdAt || ''
+                        });
                     }
                 }
             });
 
             if (allDayDrawings.length === 0) {
                 drawGrid.className = 'grid grid-cols-1';
-                drawGrid.innerHTML = `<div class="bg-slate-50 rounded-2xl p-4 text-center text-xs text-slate-400 border border-slate-100">Пока нет рисунков в истории календаря.</div>`;
+                drawGrid.innerHTML = `
+                    <div class="bg-slate-50 rounded-2xl p-4 text-center text-xs text-slate-400 border border-slate-100">
+                        Пока нет рисунков в истории календаря. Нарисуйте что-нибудь во вкладке «Меню»!
+                    </div>
+                `;
                 return;
             }
 
@@ -2267,7 +2824,10 @@
                 card.className = 'bg-slate-50 rounded-2xl overflow-hidden border border-slate-200/70 cursor-pointer hover:border-brand-300 transition group';
                 card.innerHTML = `
                     <div class="aspect-square w-full bg-white overflow-hidden relative">
-                        <img src="${drw.imageData}" alt="Рисунок" class="w-full h-full object-cover">
+                        <img src="${drw.imageData}" alt="Рисунок" class="w-full h-full object-cover group-hover:scale-105 transition">
+                        <span class="absolute top-1.5 left-1.5 bg-slate-900/65 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-md backdrop-blur-sm">
+                            ${formatHumanDate(drw.dateKey)}
+                        </span>
                     </div>
                     <div class="p-2">
                         <p class="text-[11px] font-semibold text-slate-800 truncate">${escapeHtml(drw.caption || 'Рисунок дня')}</p>
@@ -2278,16 +2838,23 @@
             });
         }
 
-        function openTodayCalendarModal() { openDayCalendarModal(getTodayDateKey()); }
+        function openTodayCalendarModal() {
+            openDayCalendarModal(getTodayDateKey());
+        }
 
         function openDayCalendarModal(dateKey) {
             activeDayModalDateKey = dateKey;
             const entry = appState.dailyPhotos[dateKey];
+
             document.getElementById('dayModalDateHeading').textContent = formatHumanDate(dateKey);
             const imgEl = document.getElementById('dayModalPhotoImg');
             const emptyState = document.getElementById('dayModalEmptyState');
             const captionInput = document.getElementById('dayModalCaptionInput');
+            const authorInfo = document.getElementById('dayModalAuthorInfo');
             const deleteBtn = document.getElementById('deleteDayPhotoBtn');
+            const drawingsSection = document.getElementById('dayModalDrawingsSection');
+            const drawingsList = document.getElementById('dayModalDrawingsList');
+            const drawingsCount = document.getElementById('dayModalDrawingsCount');
 
             if (entry && entry.imageData) {
                 pendingDayModalPhoto = entry.imageData;
@@ -2295,6 +2862,7 @@
                 imgEl.classList.remove('hidden');
                 emptyState.classList.add('hidden');
                 captionInput.value = entry.caption || '';
+                authorInfo.textContent = entry.author ? `Добавил(а): ${entry.author}` : '';
                 deleteBtn.classList.remove('hidden');
             } else {
                 pendingDayModalPhoto = null;
@@ -2302,11 +2870,50 @@
                 imgEl.classList.add('hidden');
                 emptyState.classList.remove('hidden');
                 captionInput.value = '';
+                authorInfo.textContent = '';
                 deleteBtn.classList.add('hidden');
+            }
+
+            const dayHistory = (entry && Array.isArray(entry.drawingsHistory)) ? entry.drawingsHistory : [];
+            if (dayHistory.length > 0) {
+                drawingsSection.classList.remove('hidden');
+                drawingsCount.textContent = `${dayHistory.length} шт.`;
+                drawingsList.innerHTML = '';
+                dayHistory.forEach((item, idx) => {
+                    const thumb = document.createElement('button');
+                    thumb.type = 'button';
+                    thumb.onclick = () => selectDayHistoryItemAsCover(idx);
+                    thumb.className = 'relative aspect-square rounded-xl overflow-hidden border border-slate-200 hover:border-brand-500 transition group';
+                    thumb.innerHTML = `
+                        <img src="${item.imageData}" alt="История дня" class="w-full h-full object-cover">
+                        <span class="absolute bottom-1 right-1 text-[9px] px-1 rounded bg-slate-900/70 text-white">
+                            ${item.type === 'draw' ? '🎨' : '📸'}
+                        </span>
+                    `;
+                    drawingsList.appendChild(thumb);
+                });
+            } else {
+                drawingsSection.classList.add('hidden');
             }
 
             document.getElementById('dayCalendarModal').classList.remove('hidden');
             lucide.createIcons();
+        }
+
+        function selectDayHistoryItemAsCover(idx) {
+            if (!activeDayModalDateKey) return;
+            const entry = appState.dailyPhotos[activeDayModalDateKey];
+            if (!entry || !Array.isArray(entry.drawingsHistory) || !entry.drawingsHistory[idx]) return;
+            const chosen = entry.drawingsHistory[idx];
+            pendingDayModalPhoto = chosen.imageData;
+            const imgEl = document.getElementById('dayModalPhotoImg');
+            imgEl.src = chosen.imageData;
+            imgEl.classList.remove('hidden');
+            document.getElementById('dayModalEmptyState').classList.add('hidden');
+            if (chosen.caption) {
+                document.getElementById('dayModalCaptionInput').value = chosen.caption;
+            }
+            showToast('Выбрано как обложка этого дня');
         }
 
         function closeDayCalendarModal() {
@@ -2338,43 +2945,56 @@
             imgEl.src = latest.imageData;
             imgEl.classList.remove('hidden');
             document.getElementById('dayModalEmptyState').classList.add('hidden');
+            if (!document.getElementById('dayModalCaptionInput').value.trim() && latest.caption) {
+                document.getElementById('dayModalCaptionInput').value = latest.caption;
+            }
+            showToast('Подставлено фото с главного виджета');
         }
 
         function saveDayCalendarEntry() {
-            if (!activeDayModalDateKey || !pendingDayModalPhoto) {
-                showToast('Выберите фото для этого дня', 'error');
+            if (!activeDayModalDateKey) return;
+            if (!pendingDayModalPhoto) {
+                showToast('Сначала выберите или сфотографируйте кадр для этого дня', 'error');
                 return;
             }
             const caption = document.getElementById('dayModalCaptionInput').value.trim();
             const prevEntry = appState.dailyPhotos[activeDayModalDateKey] || {};
+            const prevHistory = Array.isArray(prevEntry.drawingsHistory) ? prevEntry.drawingsHistory : [];
+
             appState.dailyPhotos[activeDayModalDateKey] = {
                 imageData: pendingDayModalPhoto,
-                caption,
+                caption: caption,
                 author: getMyName(),
                 updatedAt: Date.now(),
-                drawingsHistory: Array.isArray(prevEntry.drawingsHistory) ? prevEntry.drawingsHistory : []
+                drawingsHistory: prevHistory
             };
+
             closeDayCalendarModal();
-            saveAndSync('Фото дня сохранено в календарь!');
+            saveAndSync('Фото и подпись дня сохранены в календарь!');
         }
 
         function deleteDayCalendarEntry() {
             if (!activeDayModalDateKey) return;
             delete appState.dailyPhotos[activeDayModalDateKey];
             closeDayCalendarModal();
-            saveAndSync('Запись дня удалена');
+            saveAndSync('Запись дня удалена из календаря');
         }
 
+        // ============================================================================
+        // 8. ЖИВОЙ ВИДЖЕТ И ЛЕНТА ВОСПОМИНАНИЙ
+        // ============================================================================
         function renderLocketWidget() {
             const latest = appState.locketFeed[0];
             if (!latest) return;
+
             document.getElementById('locketHeroImage').src = latest.imageData;
             document.getElementById('locketSenderBadge').textContent = `От: ${latest.sender}`;
             document.getElementById('locketTypeBadge').textContent = latest.type === 'draw' ? 'Рисунок' : 'Фото';
             document.getElementById('locketTimestamp').textContent = latest.createdAt;
             document.getElementById('locketHeartCount').textContent = latest.hearts || 0;
+
             const captionBox = document.getElementById('locketCaptionBox');
-            if (latest.caption) {
+            if (latest.caption && latest.caption.trim() !== '') {
                 captionBox.textContent = latest.caption;
                 captionBox.classList.remove('hidden');
             } else {
@@ -2387,28 +3007,66 @@
             if (!container) return;
             container.innerHTML = '';
 
-            const dailyItems = Object.keys(appState.dailyPhotos || {}).sort((a, b) => b.localeCompare(a)).map(dateKey => {
-                const d = appState.dailyPhotos[dateKey];
-                return { id: 'cal-' + dateKey, title: d.caption || 'Фото дня', story: `От: ${d.author || 'Партнер'}`, date: formatHumanDate(dateKey), imageData: d.imageData, source: 'daily' };
-            });
+            const dailyItems = Object.keys(appState.dailyPhotos || {})
+                .sort((a, b) => b.localeCompare(a))
+                .map(dateKey => {
+                    const d = appState.dailyPhotos[dateKey];
+                    return {
+                        id: 'cal-' + dateKey,
+                        title: d.caption || 'Фото дня в календаре',
+                        story: `Добавил(а): ${d.author || 'Партнер'}`,
+                        date: formatHumanDate(dateKey),
+                        imageData: d.imageData,
+                        source: 'daily'
+                    };
+                });
 
             const combined = [
                 ...dailyItems,
                 ...appState.memories.map(m => ({ ...m, source: 'album' })),
-                ...appState.locketFeed.map(l => ({ id: l.id, title: l.caption || 'Момент', story: `От: ${l.sender}`, date: l.createdAt, imageData: l.imageData, source: 'locket' }))
-            ].filter(item => currentMemoryFilter === 'all' || item.source === currentMemoryFilter);
+                ...appState.locketFeed.map(l => ({
+                    id: l.id,
+                    title: l.caption || (l.type === 'draw' ? 'Рисунок для партнера' : 'Живое фото'),
+                    story: `Отправлено: ${l.sender}`,
+                    date: l.createdAt,
+                    imageData: l.imageData,
+                    source: 'locket'
+                }))
+            ];
 
-            if (combined.length === 0) {
-                container.innerHTML = `<div class="bg-white rounded-3xl p-8 text-center border border-slate-100 text-slate-400 text-xs">Пока нет карточек в этой категории.</div>`;
+            const filtered = combined.filter(item => {
+                if (currentMemoryFilter === 'all') return true;
+                return item.source === currentMemoryFilter;
+            });
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="bg-white rounded-3xl p-8 text-center border border-slate-100 text-slate-400 text-xs">
+                        Пока нет карточек в этой категории. Добавьте фото дня или отправьте рисунок!
+                    </div>
+                `;
                 return;
             }
 
-            combined.forEach(item => {
+            filtered.forEach(item => {
+                let badgeText = 'Особое событие';
+                let badgeColor = 'bg-warm-50 text-warm-600 border-warm-100';
+                if (item.source === 'daily') {
+                    badgeText = 'Календарь дня';
+                    badgeColor = 'bg-emerald-50 text-emerald-700 border-emerald-200';
+                } else if (item.source === 'locket') {
+                    badgeText = 'Живая карточка';
+                    badgeColor = 'bg-brand-50 text-brand-600 border-brand-100';
+                }
+
                 const card = document.createElement('div');
                 card.className = 'bg-white rounded-3xl overflow-hidden shadow-sm border border-slate-100 flex flex-col';
                 card.innerHTML = `
                     <div class="aspect-square w-full bg-slate-100 relative overflow-hidden">
-                        <img src="${item.imageData}" alt="" class="w-full h-full object-cover">
+                        <img src="${item.imageData}" alt="${escapeHtml(item.title)}" class="w-full h-full object-cover">
+                        <span class="absolute top-3 left-3 px-2.5 py-1 rounded-full text-[10px] font-semibold border ${badgeColor} backdrop-blur-md">
+                            ${badgeText}
+                        </span>
                     </div>
                     <div class="p-4 flex items-start justify-between gap-2">
                         <div>
@@ -2425,23 +3083,39 @@
         function renderRemindersAndNotes() {
             const remList = document.getElementById('remindersList');
             remList.innerHTML = '';
+
             if (appState.reminders.length === 0) {
-                remList.innerHTML = `<p class="text-xs text-slate-400 py-2 text-center">Список планов пуст</p>`;
+                remList.innerHTML = `<p class="text-xs text-slate-400 py-2 text-center">Список планов и напоминаний пуст</p>`;
             } else {
-                appState.reminders.forEach(rem => {
+                const sortedRems = [...appState.reminders].sort((a, b) => {
+                    if (a.done !== b.done) return a.done ? 1 : -1;
+                    const dtA = `${a.date || '9999-99-99'} ${a.time || '23:59'}`;
+                    const dtB = `${b.date || '9999-99-99'} ${b.time || '23:59'}`;
+                    return dtA.localeCompare(dtB);
+                });
+
+                sortedRems.forEach(rem => {
+                    const humanDate = rem.date && rem.date.includes('-') ? formatHumanDate(rem.date) : (rem.date || 'Без даты');
+                    const timeBadge = rem.time
+                        ? `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-brand-50 text-brand-700 font-bold text-[10px] border border-brand-100"><i data-lucide="clock" class="w-2.5 h-2.5"></i>${escapeHtml(rem.time)}</span>`
+                        : '';
+
                     const row = document.createElement('div');
                     row.className = 'flex items-center justify-between bg-slate-50 px-3.5 py-2.5 rounded-2xl border border-slate-200/60';
                     row.innerHTML = `
                         <button type="button" onclick="toggleReminder('${rem.id}')" class="flex items-center gap-2.5 text-left flex-1 min-w-0">
-                            <div class="w-5 h-5 rounded-lg border ${rem.done ? 'bg-brand-500 border-brand-500 text-white' : 'bg-white border-slate-300'} flex items-center justify-center shrink-0">
+                            <div class="w-5 h-5 rounded-lg border ${rem.done ? 'bg-brand-500 border-brand-500 text-white' : 'bg-white border-slate-300'} flex items-center justify-center transition shrink-0">
                                 ${rem.done ? '<i data-lucide="check" class="w-3.5 h-3.5"></i>' : ''}
                             </div>
                             <div class="min-w-0 flex-1">
                                 <div class="text-xs font-semibold truncate ${rem.done ? 'line-through text-slate-400' : 'text-slate-800'}">${escapeHtml(rem.title)}</div>
-                                <div class="text-[10px] text-slate-500">${escapeHtml(rem.date || '')} ${escapeHtml(rem.time || '')}</div>
+                                <div class="flex flex-wrap items-center gap-1.5 mt-1">
+                                    <span class="text-[10px] text-slate-500 font-medium">${escapeHtml(humanDate)}</span>
+                                    ${timeBadge}
+                                </div>
                             </div>
                         </button>
-                        <button type="button" onclick="deleteReminder('${rem.id}')" class="p-1.5 text-slate-400 hover:text-rose-500">
+                        <button type="button" onclick="deleteReminder('${rem.id}')" class="p-1.5 text-slate-400 hover:text-rose-500 transition shrink-0">
                             <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
                         </button>
                     `;
@@ -2451,24 +3125,48 @@
 
             const notesContainer = document.getElementById('sharedNotesList');
             notesContainer.innerHTML = '';
+
             appState.notes.forEach(note => {
                 const card = document.createElement('div');
-                card.className = 'bg-slate-50 rounded-2xl p-3.5 border border-slate-200/70 space-y-1.5';
+                card.className = 'bg-slate-50 rounded-2xl p-3.5 border border-slate-200/70 space-y-1.5 relative group';
                 card.innerHTML = `
                     <div class="flex items-center justify-between">
-                        <span class="text-xs font-bold text-slate-900">${escapeHtml(note.title)}</span>
-                        <button type="button" onclick="deleteSharedNote('${note.id}')" class="text-slate-400 hover:text-rose-500"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>
+                        <div class="flex items-center gap-2">
+                            <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-lg bg-white border border-slate-200 text-brand-600">${escapeHtml(note.category)}</span>
+                            <h4 class="text-xs font-bold text-slate-900">${escapeHtml(note.title)}</h4>
+                        </div>
+                        <button type="button" onclick="deleteSharedNote('${note.id}')" class="text-slate-400 hover:text-rose-500 transition">
+                            <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                        </button>
                     </div>
-                    <p class="text-xs text-slate-600 whitespace-pre-line">${escapeHtml(note.content)}</p>
+                    <p class="text-xs text-slate-600 whitespace-pre-line leading-relaxed">${escapeHtml(note.content)}</p>
+                    <div class="text-[10px] text-slate-400 font-medium pt-1">Добавил(а): ${escapeHtml(note.author)}</div>
                 `;
                 notesContainer.appendChild(card);
             });
         }
 
+        // ============================================================================
+        // 9. ВКЛАДКА «ЕДА»: КЛАДОВАЯ ОБЛАЧКОВ, СПИСОК ПОКУПОК И ЦЕПОЧКИ БЛЮД
+        // ============================================================================
         function switchFoodSubtab(subtab) {
             currentFoodSubtab = subtab;
-            document.getElementById('foodSub-pantry').classList.toggle('hidden', subtab !== 'pantry');
-            document.getElementById('foodSub-chains').classList.toggle('hidden', subtab !== 'chains');
+            const pantryDiv = document.getElementById('foodSub-pantry');
+            const chainsDiv = document.getElementById('foodSub-chains');
+            const btnPantry = document.getElementById('foodSubBtn-pantry');
+            const btnChains = document.getElementById('foodSubBtn-chains');
+
+            if (subtab === 'pantry') {
+                pantryDiv.classList.remove('hidden');
+                chainsDiv.classList.add('hidden');
+                btnPantry.className = 'py-2 px-3 rounded-xl text-xs font-semibold bg-brand-500 text-white shadow-sm transition flex items-center justify-center gap-1.5';
+                btnChains.className = 'py-2 px-3 rounded-xl text-xs font-semibold text-slate-600 hover:text-slate-900 transition flex items-center justify-center gap-1.5';
+            } else {
+                pantryDiv.classList.add('hidden');
+                chainsDiv.classList.remove('hidden');
+                btnChains.className = 'py-2 px-3 rounded-xl text-xs font-semibold bg-brand-500 text-white shadow-sm transition flex items-center justify-center gap-1.5';
+                btnPantry.className = 'py-2 px-3 rounded-xl text-xs font-semibold text-slate-600 hover:text-slate-900 transition flex items-center justify-center gap-1.5';
+            }
             renderFoodTab();
             lucide.createIcons();
         }
@@ -2478,7 +3176,8 @@
             const essentialContainer = document.getElementById('shoppingEssentialClouds');
             const optionalContainer = document.getElementById('shoppingOptionalClouds');
             const chainsContainer = document.getElementById('dishChainsContainer');
-            if (!pantryContainer) return;
+
+            if (!pantryContainer || !essentialContainer || !optionalContainer || !chainsContainer) return;
 
             pantryContainer.innerHTML = '';
             essentialContainer.innerHTML = '';
@@ -2488,16 +3187,30 @@
             appState.foodProducts.forEach(prod => {
                 const isStock = Boolean(prod.inStock);
                 const isEssential = prod.priority !== 'optional';
+
                 const cloud = document.createElement('div');
-                cloud.className = `inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border transition ${
-                    isStock ? 'bg-emerald-50 text-emerald-800 border-emerald-200' : isEssential ? 'bg-rose-50 text-rose-800 border-rose-200' : 'bg-amber-50 text-amber-800 border-amber-200'
+                cloud.className = `inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border transition select-none ${
+                    isStock
+                        ? 'bg-emerald-50/90 text-emerald-800 border-emerald-200 shadow-sm'
+                        : isEssential
+                            ? 'bg-rose-50/90 text-rose-800 border-rose-200'
+                            : 'bg-amber-50/90 text-amber-800 border-amber-200'
                 }`;
+
                 cloud.innerHTML = `
-                    <button type="button" onclick="toggleProductStock('${prod.id}')" class="flex items-center gap-1.5">
+                    <button type="button" onclick="toggleProductStock('${prod.id}')" class="flex items-center gap-1.5 text-left">
                         <span>${prod.emoji || '🍎'}</span>
                         <span>${escapeHtml(prod.name)}</span>
+                        <span class="text-[10px] px-1.5 py-0.5 rounded-full ${
+                            isStock ? 'bg-emerald-200/70 text-emerald-900' : 'bg-white/80 text-slate-600'
+                        }">${isStock ? 'Дома ✓' : 'Купить'}</span>
                     </button>
-                    <button type="button" onclick="deleteProductCloud('${prod.id}')" class="text-slate-400 hover:text-rose-600 ml-1">×</button>
+                    <button type="button" onclick="toggleProductPriority('${prod.id}')" title="Сменить приоритет: Обязательно / Желаемо" class="text-[10px] px-1.5 py-0.5 rounded-full bg-white/80 hover:bg-white border border-slate-200/60">
+                        ${isEssential ? '🔴' : '🟡'}
+                    </button>
+                    <button type="button" onclick="deleteProductCloud('${prod.id}')" title="Удалить продукт" class="text-slate-400 hover:text-rose-600 ml-0.5">
+                        ×
+                    </button>
                 `;
                 pantryContainer.appendChild(cloud);
             });
@@ -2510,55 +3223,283 @@
             document.getElementById('essentialCountText').textContent = `${essentialList.length} шт.`;
             document.getElementById('optionalCountText').textContent = `${optionalList.length} шт.`;
 
-            essentialList.forEach(prod => {
-                const btn = document.createElement('button');
-                btn.type = 'button';
-                btn.onclick = () => toggleProductStock(prod.id);
-                btn.className = 'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-white text-rose-700 border border-rose-200 shadow-sm';
-                btn.innerHTML = `<span>${prod.emoji}</span><span>${escapeHtml(prod.name)}</span>`;
-                essentialContainer.appendChild(btn);
-            });
+            if (essentialList.length === 0) {
+                essentialContainer.innerHTML = `<span class="text-[11px] text-slate-400 italic">Все обязательные продукты есть дома ✨</span>`;
+            } else {
+                essentialList.forEach(prod => {
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.onclick = () => toggleProductStock(prod.id);
+                    btn.className = 'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-white hover:bg-emerald-50 text-rose-700 hover:text-emerald-700 border border-rose-200 shadow-sm transition active:scale-95';
+                    btn.innerHTML = `<span>${prod.emoji || '🛒'}</span><span>${escapeHtml(prod.name)}</span><span class="text-[10px] text-slate-400">+ в дом</span>`;
+                    essentialContainer.appendChild(btn);
+                });
+            }
 
-            optionalList.forEach(prod => {
-                const btn = document.createElement('button');
-                btn.type = 'button';
-                btn.onclick = () => toggleProductStock(prod.id);
-                btn.className = 'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-white text-amber-700 border border-amber-200 shadow-sm';
-                btn.innerHTML = `<span>${prod.emoji}</span><span>${escapeHtml(prod.name)}</span>`;
-                optionalContainer.appendChild(btn);
-            });
+            if (optionalList.length === 0) {
+                optionalContainer.innerHTML = `<span class="text-[11px] text-slate-400 italic">Список вкусняшек пуст</span>`;
+            } else {
+                optionalList.forEach(prod => {
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.onclick = () => toggleProductStock(prod.id);
+                    btn.className = 'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-white hover:bg-emerald-50 text-amber-700 hover:text-emerald-700 border border-amber-200 shadow-sm transition active:scale-95';
+                    btn.innerHTML = `<span>${prod.emoji || '✨'}</span><span>${escapeHtml(prod.name)}</span><span class="text-[10px] text-slate-400">+ в дом</span>`;
+                    optionalContainer.appendChild(btn);
+                });
+            }
 
-            appState.dishChains.forEach(dish => {
-                const linkedProducts = (dish.productIds || []).map(pid => appState.foodProducts.find(p => p.id === pid)).filter(Boolean);
-                const chainHtml = linkedProducts.map(p => `<span class="px-2 py-0.5 rounded-full text-[11px] bg-white border">${p.emoji} ${escapeHtml(p.name)}</span>`).join(' ➔ ');
-                const card = document.createElement('div');
-                card.className = 'bg-white rounded-3xl p-4 shadow-sm border border-slate-100 space-y-2';
-                card.innerHTML = `
-                    <div class="flex items-center justify-between">
-                        <h4 class="text-sm font-bold">${dish.emoji || '🍝'} ${escapeHtml(dish.title)}</h4>
-                        <button type="button" onclick="deleteDishChain('${dish.id}')" class="text-slate-400 hover:text-rose-500"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+            if (appState.dishChains.length === 0) {
+                chainsContainer.innerHTML = `
+                    <div class="bg-white rounded-3xl p-6 text-center border border-slate-100 text-xs text-slate-400">
+                        У вас пока нет собранных цепочек блюд. Нажмите «Собрать блюдо»!
                     </div>
-                    <div class="flex flex-wrap items-center gap-1 bg-slate-50 p-2.5 rounded-2xl text-xs">${chainHtml}</div>
                 `;
-                chainsContainer.appendChild(card);
-            });
+            } else {
+                appState.dishChains.forEach(dish => {
+                    const linkedProducts = (dish.productIds || [])
+                        .map(pid => appState.foodProducts.find(p => p.id === pid))
+                        .filter(Boolean);
+
+                    const missingCount = linkedProducts.filter(p => !p.inStock).length;
+
+                    const chainHtml = linkedProducts.map(p => `
+                        <button type="button" onclick="toggleProductStock('${p.id}')" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold border transition ${
+                            p.inStock
+                                ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                                : 'bg-rose-50 text-rose-700 border-rose-200'
+                        }">
+                            <span>${p.emoji || '🍎'}</span>
+                            <span>${escapeHtml(p.name)}</span>
+                        </button>
+                    `).join('<span class="text-slate-300 font-bold text-xs">➔</span>');
+
+                    const card = document.createElement('div');
+                    card.className = 'bg-white rounded-3xl p-4 shadow-sm border border-slate-100 space-y-3';
+                    card.innerHTML = `
+                        <div class="flex items-center justify-between gap-2">
+                            <div class="flex items-center gap-2">
+                                <span class="text-xl">${dish.emoji || '🍝'}</span>
+                                <div>
+                                    <h4 class="text-sm font-bold text-slate-900">${escapeHtml(dish.title)}</h4>
+                                    <p class="text-[10px] font-medium ${missingCount === 0 ? 'text-emerald-600' : 'text-amber-600'}">
+                                        ${missingCount === 0 ? 'Все ингредиенты дома ✓' : `Не хватает продуктов: ${missingCount} шт.`}
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                ${missingCount > 0 ? `
+                                    <button type="button" onclick="sendMissingDishIngredientsToShop('${dish.id}')" class="px-2.5 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 text-[10px] font-bold transition">
+                                        В магазин
+                                    </button>
+                                ` : ''}
+                                <button type="button" onclick="deleteDishChain('${dish.id}')" class="p-1.5 text-slate-400 hover:text-rose-500 transition">
+                                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-1.5 bg-slate-50 p-3 rounded-2xl border border-slate-100">
+                            ${chainHtml}
+                            <span class="text-slate-300 font-bold text-xs">➔</span>
+                            <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-brand-500 text-white shadow-sm">
+                                ${dish.emoji || '🍝'} ${escapeHtml(dish.title)}
+                            </span>
+                        </div>
+                    `;
+                    chainsContainer.appendChild(card);
+                });
+            }
         }
 
         function toggleProductStock(prodId) {
             const prod = appState.foodProducts.find(p => p.id === prodId);
             if (!prod) return;
             prod.inStock = !prod.inStock;
-            saveAndSync();
+            saveAndSync(prod.inStock ? `${prod.name}: отмечено «Есть дома» ✓` : `${prod.name}: добавлено в список покупок 🛒`);
+        }
+
+        function toggleProductPriority(prodId) {
+            const prod = appState.foodProducts.find(p => p.id === prodId);
+            if (!prod) return;
+            prod.priority = prod.priority === 'optional' ? 'essential' : 'optional';
+            saveAndSync(`Приоритет изменен: ${prod.priority === 'essential' ? 'Обязательно 🔴' : 'Желаемо 🟡'}`);
         }
 
         function deleteProductCloud(prodId) {
             appState.foodProducts = appState.foodProducts.filter(p => p.id !== prodId);
-            saveAndSync();
+            saveAndSync('Облачко продукта удалено');
+        }
+
+        function openAddProductModal() {
+            selectedProductEmoji = '🥛';
+            document.getElementById('newProductNameInput').value = '';
+            document.getElementById('addProductModal').classList.remove('hidden');
+        }
+
+        function closeAddProductModal() {
+            document.getElementById('addProductModal').classList.add('hidden');
+        }
+
+        function selectProductEmoji(emoji) {
+            selectedProductEmoji = emoji;
+            showToast(`Выбрана иконка ${emoji}`);
+        }
+
+        function saveNewProductCloud() {
+            const name = document.getElementById('newProductNameInput').value.trim();
+            const priority = document.getElementById('newProductPriorityInput').value;
+            const stockMode = document.getElementById('newProductStockInput').value;
+
+            if (!name) {
+                showToast('Введите название продукта', 'error');
+                return;
+            }
+
+            appState.foodProducts.push({
+                id: 'prd-' + Date.now(),
+                name,
+                emoji: selectedProductEmoji || '🍎',
+                inStock: stockMode === 'stock',
+                priority: priority || 'essential'
+            });
+
+            closeAddProductModal();
+            saveAndSync('Облачко продукта добавлено!');
+        }
+
+        function openCreateDishModal() {
+            selectedDishProductIds = [];
+            document.getElementById('newDishTitleInput').value = '';
+            renderDishBuilderSelector();
+            document.getElementById('createDishModal').classList.remove('hidden');
+        }
+
+        function closeCreateDishModal() {
+            document.getElementById('createDishModal').classList.add('hidden');
+        }
+
+        function renderDishBuilderSelector() {
+            const selector = document.getElementById('dishBuilderCloudSelector');
+            const preview = document.getElementById('dishChainLivePreview');
+            if (!selector || !preview) return;
+
+            selector.innerHTML = '';
+            appState.foodProducts.forEach(prod => {
+                const isSelected = selectedDishProductIds.includes(prod.id);
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.onclick = () => toggleDishBuilderProduct(prod.id);
+                btn.className = `inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold border transition ${
+                    isSelected
+                        ? 'bg-brand-500 text-white border-brand-500 shadow-sm'
+                        : 'bg-white text-slate-700 border-slate-200 hover:border-brand-300'
+                }`;
+                btn.innerHTML = `<span>${prod.emoji || '🍎'}</span><span>${escapeHtml(prod.name)}</span>`;
+                selector.appendChild(btn);
+            });
+
+            if (selectedDishProductIds.length === 0) {
+                preview.textContent = 'Выберите хотя бы 1 продукт выше...';
+            } else {
+                const chainItems = selectedDishProductIds
+                    .map(id => appState.foodProducts.find(p => p.id === id))
+                    .filter(Boolean)
+                    .map(p => `<span class="px-2 py-0.5 rounded-full bg-white border border-brand-200 text-brand-700 font-semibold">${p.emoji} ${escapeHtml(p.name)}</span>`)
+                    .join(' ➔ ');
+                preview.innerHTML = chainItems;
+            }
+        }
+
+        function toggleDishBuilderProduct(prodId) {
+            if (selectedDishProductIds.includes(prodId)) {
+                selectedDishProductIds = selectedDishProductIds.filter(id => id !== prodId);
+            } else {
+                selectedDishProductIds.push(prodId);
+            }
+            renderDishBuilderSelector();
+        }
+
+        function quickAddProductFromDishModal() {
+            const inp = document.getElementById('quickChainProductInput');
+            const name = inp.value.trim();
+            if (!name) return;
+
+            const newId = 'prd-' + Date.now();
+            appState.foodProducts.push({
+                id: newId,
+                name,
+                emoji: '🥗',
+                inStock: false,
+                priority: 'essential'
+            });
+            selectedDishProductIds.push(newId);
+            inp.value = '';
+            renderDishBuilderSelector();
+        }
+
+        function saveNewDishChain() {
+            const title = document.getElementById('newDishTitleInput').value.trim();
+            const emoji = document.getElementById('newDishEmojiInput').value;
+
+            if (!title) {
+                showToast('Введите название блюда', 'error');
+                return;
+            }
+            if (selectedDishProductIds.length === 0) {
+                showToast('Выберите хотя бы одно облачко продукта для цепочки', 'error');
+                return;
+            }
+
+            appState.dishChains.unshift({
+                id: 'dish-' + Date.now(),
+                title,
+                emoji: emoji || '🍝',
+                productIds: [...selectedDishProductIds]
+            });
+
+            closeCreateDishModal();
+            saveAndSync('Цепочка блюда сохранена!');
+        }
+
+        function sendMissingDishIngredientsToShop(dishId) {
+            const dish = appState.dishChains.find(d => d.id === dishId);
+            if (!dish) return;
+            (dish.productIds || []).forEach(pid => {
+                const prod = appState.foodProducts.find(p => p.id === pid);
+                if (prod && !prod.inStock) {
+                    prod.priority = 'essential';
+                }
+            });
+            saveAndSync('Недостающие продукты перенесены в «Обязательно купить»!');
         }
 
         function deleteDishChain(dishId) {
             appState.dishChains = appState.dishChains.filter(d => d.id !== dishId);
-            saveAndSync();
+            saveAndSync('Цепочка блюда удалена');
+        }
+
+        // ============================================================================
+        // 10. ВКЛАДКА «КАБИНЕТ» (ПРОФИЛЬ, СОГЛАСИЕ ПАРТНЕРА И КОД КОМНАТЫ)
+        // ============================================================================
+        function calculateBirthdayStats(birthdateStr) {
+            if (!birthdateStr || !birthdateStr.includes('-')) return null;
+            const parts = birthdateStr.split('-');
+            const birthDate = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+            if (isNaN(birthDate.getTime())) return null;
+
+            const today = new Date();
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const mDiff = today.getMonth() - birthDate.getMonth();
+            if (mDiff < 0 || (mDiff === 0 && today.getDate() < birthDate.getDate())) {
+                age--;
+            }
+
+            const nextBday = new Date(today.getFullYear(), birthDate.getMonth(), birthDate.getDate());
+            if (nextBday < new Date(today.getFullYear(), today.getMonth(), today.getDate())) {
+                nextBday.setFullYear(today.getFullYear() + 1);
+            }
+            const daysUntil = Math.round((nextBday - new Date(today.getFullYear(), today.getMonth(), today.getDate())) / 86400000);
+            return { age: Math.max(0, age), daysUntil };
         }
 
         function renderSyncTabState() {
@@ -2567,7 +3508,7 @@
             const partner = getPartnerMemberProfile();
             const connected = isPartnerConnected();
 
-            renderAvatarElement(document.getElementById('profileAvatarBadge'), me.avatar);
+            renderAvatarElement(document.getElementById('profileAvatarBadge'), me.avatar || '🥰');
             document.getElementById('profileDisplayName').textContent = me.name;
             document.getElementById('profileLoginHandle').textContent = `@${currentUser.login}`;
 
@@ -2578,111 +3519,121 @@
             if (document.activeElement !== bdayInp) bdayInp.value = me.birthdate || '';
             if (document.activeElement !== bioInp) bioInp.value = me.bio || '';
 
-            const fbInp = document.getElementById('cabinetFirebaseUrlInput');
-            if (fbInp && document.activeElement !== fbInp) {
-                fbInp.value = instantRelayCloud.cleanDbUrl();
-            }
-
-            const ghBadge = document.getElementById('githubCloudStatusBadge');
-            if (ghBadge) {
-                const p2pOpen = instantRelayCloud.activeConns && instantRelayCloud.activeConns.some(c => c && c.open);
-                if (instantRelayCloud.hasFirebaseUrl() && p2pOpen) {
-                    ghBadge.textContent = 'Firebase 24/7 + P2P активны';
-                    ghBadge.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200';
-                } else if (instantRelayCloud.hasFirebaseUrl()) {
-                    ghBadge.textContent = 'Firebase 24/7 активен';
-                    ghBadge.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200';
-                } else if (p2pOpen) {
-                    ghBadge.textContent = 'Прямая связь P2P активна';
-                    ghBadge.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200';
-                } else {
-                    ghBadge.textContent = 'P2P Мост готов';
-                    ghBadge.className = 'text-[10px] font-semibold px-2 py-0.5 rounded-full bg-brand-50 text-brand-700 border border-brand-200';
-                }
+            const myBdayStats = calculateBirthdayStats(me.birthdate);
+            const ageBadge = document.getElementById('myBirthdayAgeBadge');
+            if (myBdayStats) {
+                ageBadge.textContent = myBdayStats.daysUntil === 0
+                    ? `🎂 Сегодня ДР! (${myBdayStats.age} л.)`
+                    : `${myBdayStats.age} л. • до ДР ${myBdayStats.daysUntil} дн.`;
+            } else {
+                ageBadge.textContent = '';
             }
 
             const connBadge = document.getElementById('pairConnectionBadge');
             const partnerCard = document.getElementById('partnerProfileCard');
 
             if (connected) {
-                connBadge.textContent = `Подключен(а): ${partner.name}`;
+                connBadge.textContent = 'Партнер подключен ❤️';
                 connBadge.className = 'text-[11px] font-bold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200';
                 partnerCard.classList.remove('hidden');
-                renderAvatarElement(document.getElementById('partnerCabinetAvatar'), partner.avatar);
-                document.getElementById('partnerCabinetName').textContent = partner.name;
+
+                renderAvatarElement(document.getElementById('partnerCabinetAvatar'), partner.avatar || '💖');
+                document.getElementById('partnerCabinetName').textContent = partner.name || 'Партнер';
                 document.getElementById('partnerCabinetBirthdate').textContent = partner.birthdate
                     ? `День рождения: ${formatHumanDate(partner.birthdate)}`
                     : 'Дата рождения пока не указана';
-                document.getElementById('partnerCabinetBio').textContent = partner.bio || 'Партнер пока не заполнил раздел «О себе»';
+                document.getElementById('partnerCabinetBio').textContent = partner.bio || 'Партнер пока еще не заполнил раздел «О себе»...';
+
+                const pBdayStats = calculateBirthdayStats(partner.birthdate);
+                document.getElementById('partnerBirthdayCountdown').textContent = pBdayStats
+                    ? (pBdayStats.daysUntil === 0 ? '🎉 Сегодня День рождения!' : `До ДР: ${pBdayStats.daysUntil} дн.`)
+                    : '';
             } else {
-                connBadge.textContent = 'Ожидание партнера';
+                connBadge.textContent = 'Ожидание согласия';
                 connBadge.className = 'text-[11px] font-bold px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200';
                 partnerCard.classList.add('hidden');
             }
 
-            const codeEl = document.getElementById('myPairCodeDisplay');
-            if (codeEl) codeEl.textContent = currentUser.pairCode;
+            document.getElementById('myPairCodeDisplay').textContent = currentUser.pairCode;
+
+            const fbInp = document.getElementById('customFirebaseUrlInput');
+            if (fbInp && document.activeElement !== fbInp) {
+                fbInp.value = instantRelayCloud.dbUrl || '';
+            }
+
+            const ghBadge = document.getElementById('githubCloudStatusBadge');
+            if (ghBadge) {
+                const openPeers = (instantRelayCloud.activeConns || []).filter(c => c && c.open).length;
+                if (instantRelayCloud.cleanDbUrl()) {
+                    ghBadge.textContent = 'Firebase 24/7 активен';
+                    ghBadge.className = 'text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200';
+                } else if (openPeers > 0) {
+                    ghBadge.textContent = 'Прямая связь (P2P)';
+                    ghBadge.className = 'text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200';
+                } else {
+                    ghBadge.textContent = 'Сигнальное облако активно';
+                    ghBadge.className = 'text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-brand-50 text-brand-700 border border-brand-200';
+                }
+            }
+        }
+
+        function saveCustomFirebaseUrl() {
+            const inp = document.getElementById('customFirebaseUrlInput');
+            const val = (inp ? inp.value : '').trim().replace(/\/+$/, '');
+            if (!val) {
+                localStorage.removeItem('cs_custom_firebase_url');
+                instantRelayCloud.dbUrl = '';
+                renderSyncTabState();
+                showToast('Ссылка Firebase очищена');
+                return;
+            }
+            if (!val.startsWith('https://')) {
+                showToast('Ссылка должна начинаться с https://', 'error');
+                return;
+            }
+            instantRelayCloud.dbUrl = val;
+            localStorage.setItem('cs_custom_firebase_url', val);
+            saveRoomLocally(true);
+            renderSyncTabState();
+            showToast('Облако Firebase 24/7 успешно подключено!');
         }
 
         function regenerateMyRoomCode() {
             if (!currentUser) return;
-            currentUser.pairCode = generatePairCode();
+            const freshCode = generatePairCode();
+            currentUser.pairCode = freshCode;
             persistCurrentUserProfile();
-            loadOrCreateCoupleRoom(currentUser.pairCode, true);
-            instantRelayCloud.subscribeRoom(currentUser.pairCode, (remoteState) => {
+            loadOrCreateCoupleRoom(freshCode, true);
+            instantRelayCloud.subscribeRoom(freshCode, (remoteState) => {
                 applyRemoteRoomUpdate(remoteState);
             });
             renderAll();
-            showToast(`Новый код комнаты: ${currentUser.pairCode}`);
+            showToast(`Сгенерирован новый 10-значный код: ${freshCode}`);
         }
 
-        // НАДЕЖНОЕ КОПИРОВАНИЕ КОДА КОМНАТЫ НА ЛЮБОМ ТЕЛЕФОНЕ
         function copyMyPairCode() {
-            const codeEl = document.getElementById('myPairCodeDisplay');
-            const code = (currentUser && currentUser.pairCode) ? currentUser.pairCode : (codeEl ? codeEl.textContent.trim() : '');
-            if (!code || code === 'XXXXXXXXXX') {
-                showToast('Сначала войдите в аккаунт', 'error');
-                return;
+            if (!currentUser) return;
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(currentUser.pairCode).catch(() => {});
             }
-            if (navigator.clipboard && window.isSecureContext) {
-                navigator.clipboard.writeText(code).then(() => {
-                    showToast(`Код ${code} скопирован в буфер!`);
-                }).catch(() => {
-                    fallbackCopyText(code);
-                });
-            } else {
-                fallbackCopyText(code);
-            }
-        }
-
-        function fallbackCopyText(text) {
-            const el = document.createElement('textarea');
-            el.value = text;
-            el.setAttribute('readonly', '');
-            el.style.position = 'fixed';
-            el.style.top = '-9999px';
-            el.style.opacity = '0';
-            document.body.appendChild(el);
-            el.focus();
-            el.select();
-            el.setSelectionRange(0, 99999);
-            try {
-                document.execCommand('copy');
-                showToast(`Код ${text} скопирован в буфер!`);
-            } catch (e) {
-                showToast(`Ваш код: ${text}`, 'success');
-            }
-            document.body.removeChild(el);
+            const temp = document.createElement('input');
+            temp.value = currentUser.pairCode;
+            document.body.appendChild(temp);
+            temp.select();
+            document.execCommand('copy');
+            document.body.removeChild(temp);
+            showToast(`Код ${currentUser.pairCode} скопирован!`);
         }
 
         function handleProfileAvatarUpload(event) {
             const file = event.target.files[0];
             if (!file || !currentUser) return;
-            compressImageFileToSquare(file, (compressedUrl) => {
-                currentUser.avatar = compressedUrl;
-                getMyMemberProfile().avatar = compressedUrl;
+            compressImageFileToSquare(file, (compressedDataUrl) => {
+                currentUser.avatar = compressedDataUrl;
+                const me = getMyMemberProfile();
+                me.avatar = compressedDataUrl;
                 persistCurrentUserProfile();
-                saveAndSync('Аватар профиля обновлен ✓');
+                saveAndSync('Фото профиля обновлено!');
             });
         }
 
@@ -2700,166 +3651,130 @@
                 };
                 saveLocalAccountsDB(accountsDB);
                 instantRelayCloud.saveAccountToCloud(currentUser.login, accountsDB[currentUser.login]);
+                if (window.cloudSyncBridge) {
+                    window.cloudSyncBridge.saveUserAccount(currentUser.login, accountsDB[currentUser.login]);
+                }
             }
-            localStorage.setItem(STORAGE_KEY_SESSION, JSON.stringify(currentUser));
+            if (localStorage.getItem(STORAGE_KEY_SESSION)) {
+                localStorage.setItem(STORAGE_KEY_SESSION, JSON.stringify(currentUser));
+            } else {
+                sessionStorage.setItem(STORAGE_KEY_SESSION, JSON.stringify(currentUser));
+            }
         }
 
         function saveMyPersonalCabinet() {
-            if (!currentUser) return;
+            if (!currentUser || !appState) return;
             const newName = document.getElementById('myDisplayNameInput').value.trim();
-            if (!newName) { showToast('Укажите ваше имя', 'error'); return; }
+            const newBirthdate = document.getElementById('myBirthdateInput').value;
+            const newBio = document.getElementById('myBioInput').value.trim();
+
+            if (!newName) {
+                showToast('Пожалуйста, укажите ваше имя', 'error');
+                return;
+            }
+
             currentUser.name = newName;
-            currentUser.birthdate = document.getElementById('myBirthdateInput').value;
-            currentUser.bio = document.getElementById('myBioInput').value.trim();
+            currentUser.birthdate = newBirthdate;
+            currentUser.bio = newBio;
 
             const me = getMyMemberProfile();
-            me.name = currentUser.name;
-            me.birthdate = currentUser.birthdate;
-            me.bio = currentUser.bio;
+            me.name = newName;
+            me.birthdate = newBirthdate;
+            me.bio = newBio;
 
             persistCurrentUserProfile();
-            saveAndSync('Личный профиль сохранен ✓');
+            saveAndSync('Личный профиль сохранен!');
         }
 
-        // НАДЕЖНАЯ СВЯЗЬ С ПАРТНЕРОМ И ОТОБРАЖЕНИЕ НАСТОЯЩЕГО ИМЕНИ ПАРТНЕРА
+        // ОТПРАВКА ЗАПРОСА ПАРТНЕРУ И СВЯЗКА ПО 10-ЗНАЧНОМУ КОДУ
         async function linkWithPartnerCode() {
-            const inp = document.getElementById('enterPartnerCodeInput');
+            const codeInput = document.getElementById('enterPartnerCodeInput');
             const submitBtn = document.getElementById('linkPartnerSubmitBtn');
-            if (!inp || !currentUser) return;
+            const newCode = codeInput.value.trim().toUpperCase();
+            if (!PAIR_CODE_REGEX.test(newCode)) {
+                showToast('Код комнаты должен состоять ровно из 10 латинских букв и цифр!', 'error');
+                return;
+            }
 
-            const code = inp.value.trim().toUpperCase();
-            if (!PAIR_CODE_REGEX.test(code)) {
-                showToast('Код должен состоять ровно из 10 латинских букв/цифр!', 'error');
+            // Если у нас уже висит входящий запрос от партнера и мы нажали «Связать» — сразу подтверждаем его!
+            if (pendingJoinRequester) {
+                await acceptIncomingPartnerRequest();
+                codeInput.value = '';
                 return;
             }
 
             if (submitBtn) {
                 submitBtn.disabled = true;
-                submitBtn.innerHTML = '<span>Связываем...</span>';
+                submitBtn.innerHTML = '<span>Запрос...</span>';
             }
 
-            currentUser.pairCode = code;
+            currentUser.pairCode = newCode;
             persistCurrentUserProfile();
 
-            // 1. Проверяем, есть ли уже комната партнера в Firebase, GitHub или в локальной памяти браузера
-            let remote = await instantRelayCloud.fetchRoomState(code);
-            if (!remote && githubCloudEngine.isConfigured()) {
-                remote = await githubCloudEngine.fetchRoomState(code);
-            }
-            if (!remote) {
-                try {
-                    const localRoomRaw = localStorage.getItem(STORAGE_KEY_ROOMS_PREFIX + code);
-                    if (localRoomRaw) remote = JSON.parse(localRoomRaw);
-                } catch (e) {}
-            }
-
-            // Попутно проверяем локальную базу аккаунтов (если тестируем на одном устройстве), чтобы сразу подтянуть имя партнера
-            const localAccs = getLocalAccountsDB();
-            let foundPartnerAcc = null;
-            Object.values(localAccs).forEach(acc => {
-                if (acc && acc.pairCode === code && acc.login !== currentUser.login) {
-                    foundPartnerAcc = acc;
-                }
-            });
-
-            if (remote) {
-                appState = remote;
+            // 1. Сначала проверяем, есть ли уже комната с этим кодом в облаке
+            const remoteRoom = await instantRelayCloud.fetchRoomState(newCode);
+            if (remoteRoom) {
+                appState = {
+                    ...(appState || createDefaultRoomState(currentUser)),
+                    ...remoteRoom,
+                    pairCode: newCode
+                };
                 ensureAppStateIntegrity();
             } else {
-                loadOrCreateCoupleRoom(code, false);
+                loadOrCreateCoupleRoom(newCode, false);
             }
 
-            appState.pairCode = code;
-            appState.partnerLinkedManually = true;
+            // 2. Добавляем свой профиль с реальным именем в участники
+            appState.pairCode = newCode;
             if (!appState.members) appState.members = {};
-
-            // Добавляем найденного партнера в участники комнаты, если его еще нет
-            if (foundPartnerAcc && !appState.members[foundPartnerAcc.login]) {
-                appState.members[foundPartnerAcc.login] = {
-                    name: foundPartnerAcc.name,
-                    avatar: foundPartnerAcc.avatar || '💖',
-                    birthdate: foundPartnerAcc.birthdate || '',
-                    bio: foundPartnerAcc.bio || '',
-                    moodEmoji: '💖',
-                    moodText: 'На связи!'
-                };
-            }
-
-            // Записываем свой профиль в участники комнаты
             appState.members[currentUser.login] = {
                 name: currentUser.name,
                 avatar: currentUser.avatar || '🥰',
                 birthdate: currentUser.birthdate || '',
                 bio: currentUser.bio || '',
                 moodEmoji: '💖',
-                moodText: 'На связи!'
+                moodText: 'Жду подтверждения ❤️'
             };
 
-            // 2. Сохраняем и запускаем прямой P2P-мост и облачную подписку
             saveRoomLocally(true);
-            instantRelayCloud.subscribeRoom(code, (remoteState) => {
-                applyRemoteRoomUpdate(remoteState);
+
+            // 3. Подписываемся на комнату партнера и отправляем ему всплывающий сигнал запроса!
+            instantRelayCloud.subscribeRoom(newCode, (incomingState) => {
+                applyRemoteRoomUpdate(incomingState);
             });
+            await instantRelayCloud.sendJoinRequestSignal(newCode, currentUser);
+
+            if (window.cloudSyncBridge && window.cloudSyncBridge.ready) {
+                window.cloudSyncBridge.subscribeCoupleRoom(newCode, (incomingState) => {
+                    applyRemoteRoomUpdate(incomingState);
+                });
+            }
 
             if (submitBtn) {
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = '<i data-lucide="link" class="w-3.5 h-3.5"></i><span>Связать</span>';
             }
 
-            inp.value = '';
+            codeInput.value = '';
             renderAll();
 
-            const partnerProfile = getPartnerMemberProfile();
-            if (partnerProfile && partnerProfile.name && partnerProfile.name !== 'Партнер не подключен') {
-                showToast(`Пара связана с ${partnerProfile.name}! ❤️`);
+            if (isPartnerConnected()) {
+                showToast(`Пара с ${getPartnerMemberProfile().name} успешно связана! ❤️`);
             } else {
-                showToast('Код подключен! Ожидаем отклик от телефона партнера...');
+                showToast('Запрос отправлен! На втором телефоне всплывет кнопка «Принять пару ❤️»');
             }
         }
 
-        async function saveCabinetFirebaseUrl() {
-            const inp = document.getElementById('cabinetFirebaseUrlInput');
-            const raw = inp.value.trim();
-            if (!raw || !raw.startsWith('https://')) {
-                showToast('Вставьте ссылку вида https://ваш-проект.firebaseio.com', 'error');
-                return;
-            }
-            instantRelayCloud.setFirebaseUrl(raw);
-            showToast('Проверяем соединение с Firebase...');
-
-            if (currentUser && currentUser.pairCode) {
-                const remote = await instantRelayCloud.fetchRoomState(currentUser.pairCode);
-                if (remote) {
-                    applyRemoteRoomUpdate(remote);
-                }
-                await instantRelayCloud.pushRoomState(currentUser.pairCode, appState);
-                instantRelayCloud.subscribeRoom(currentUser.pairCode, (remoteState) => {
-                    applyRemoteRoomUpdate(remoteState);
-                });
-            }
-            renderAll();
-            showToast('Облако Firebase 24/7 успешно подключено! ☁️');
-        }
-
-        let devTapCounter = 0;
-        function handleDevCloudTap() {
-            devTapCounter++;
-            if (devTapCounter >= 5) {
-                devTapCounter = 0;
-                document.getElementById('devGithubSetupBox').classList.toggle('hidden');
-            }
-        }
-
-        function saveDevGithubConfig() {
-            showToast('Настройки сохранены');
-        }
-
+        // ============================================================================
+        // 11. ХОЛСТ ДЛЯ РИСОВАНИЯ И ЖИВАЯ КАМЕРА
+        // ============================================================================
         function initDrawingCanvas() {
             const canvas = document.getElementById('drawingCanvas');
             if (!canvas) return;
             canvas.width = 480;
             canvas.height = 480;
             const ctx = canvas.getContext('2d');
+
             ctx.fillStyle = '#FFFDF9';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             saveCanvasSnapshot();
@@ -2903,6 +3818,7 @@
             canvas.addEventListener('mousedown', startStroke);
             canvas.addEventListener('mousemove', moveStroke);
             window.addEventListener('mouseup', endStroke);
+
             canvas.addEventListener('touchstart', startStroke, { passive: false });
             canvas.addEventListener('touchmove', moveStroke, { passive: false });
             window.addEventListener('touchend', endStroke);
@@ -2910,8 +3826,12 @@
 
         function setBrushColor(color, btnEl) {
             brushColor = color;
-            document.querySelectorAll('.color-swatch').forEach(b => b.classList.remove('ring-2', 'ring-offset-2', 'ring-brand-500'));
-            if (btnEl) btnEl.classList.add('ring-2', 'ring-offset-2', 'ring-brand-500');
+            document.querySelectorAll('.color-swatch').forEach(b => {
+                b.classList.remove('ring-2', 'ring-offset-2', 'ring-brand-500');
+            });
+            if (btnEl) {
+                btnEl.classList.add('ring-2', 'ring-offset-2', 'ring-brand-500');
+            }
         }
 
         function clearDrawingCanvas() {
@@ -2930,21 +3850,113 @@
         }
 
         function undoCanvasStroke() {
-            if (canvasHistory.length <= 1) { clearDrawingCanvas(); return; }
+            if (canvasHistory.length <= 1) {
+                clearDrawingCanvas();
+                return;
+            }
             canvasHistory.pop();
             const previousData = canvasHistory[canvasHistory.length - 1];
             const canvas = document.getElementById('drawingCanvas');
             const ctx = canvas.getContext('2d');
             const img = new Image();
-            img.onload = () => { ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.drawImage(img, 0, 0); };
+            img.onload = () => {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(img, 0, 0);
+            };
             img.src = previousData;
         }
 
         function setCreatorMode(mode) {
             currentCreatorMode = mode;
-            document.getElementById('creatorDrawPanel').classList.toggle('hidden', mode !== 'draw');
-            document.getElementById('creatorPhotoPanel').classList.toggle('hidden', mode !== 'photo');
-            if (mode === 'draw') stopLiveCamera();
+            const drawPanel = document.getElementById('creatorDrawPanel');
+            const photoPanel = document.getElementById('creatorPhotoPanel');
+            const btnDraw = document.getElementById('modeBtnDraw');
+            const btnPhoto = document.getElementById('modeBtnPhoto');
+
+            if (mode === 'draw') {
+                drawPanel.classList.remove('hidden');
+                photoPanel.classList.add('hidden');
+                btnDraw.className = 'px-3 py-1.5 rounded-xl bg-white text-slate-900 shadow-sm transition flex items-center gap-1.5';
+                btnPhoto.className = 'px-3 py-1.5 rounded-xl text-slate-500 hover:text-slate-800 transition flex items-center gap-1.5';
+                stopLiveCamera();
+            } else {
+                drawPanel.classList.add('hidden');
+                photoPanel.classList.remove('hidden');
+                btnPhoto.className = 'px-3 py-1.5 rounded-xl bg-white text-slate-900 shadow-sm transition flex items-center gap-1.5';
+                btnDraw.className = 'px-3 py-1.5 rounded-xl text-slate-500 hover:text-slate-800 transition flex items-center gap-1.5';
+            }
+        }
+
+        async function startLiveCamera() {
+            try {
+                mediaStream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: 'user', width: { ideal: 720 }, height: { ideal: 720 } },
+                    audio: false
+                });
+                const video = document.getElementById('cameraStreamVideo');
+                video.srcObject = mediaStream;
+                video.classList.remove('hidden');
+                document.getElementById('cameraPlaceholder').classList.add('hidden');
+                document.getElementById('capturedPhotoPreview').classList.add('hidden');
+                document.getElementById('retakePhotoBtn').classList.add('hidden');
+                document.getElementById('cameraActiveControls').classList.remove('hidden');
+            } catch (e) {
+                showToast('Камера недоступна, выберите фото через кнопку «Выбрать / Снять»', 'error');
+            }
+        }
+
+        function stopLiveCamera() {
+            if (mediaStream) {
+                mediaStream.getTracks().forEach(track => track.stop());
+                mediaStream = null;
+            }
+            document.getElementById('cameraStreamVideo').classList.add('hidden');
+            document.getElementById('cameraActiveControls').classList.add('hidden');
+            if (!pendingPhotoDataUrl) {
+                document.getElementById('cameraPlaceholder').classList.remove('hidden');
+            }
+        }
+
+        function takeSnapshotFromVideo() {
+            const video = document.getElementById('cameraStreamVideo');
+            const c = document.createElement('canvas');
+            c.width = 400;
+            c.height = 400;
+            const ctx = c.getContext('2d');
+
+            const size = Math.min(video.videoWidth || 400, video.videoHeight || 400);
+            const sx = ((video.videoWidth || 400) - size) / 2;
+            const sy = ((video.videoHeight || 400) - size) / 2;
+            ctx.drawImage(video, sx, sy, size, size, 0, 0, 400, 400);
+
+            pendingPhotoDataUrl = c.toDataURL('image/jpeg', 0.72);
+            stopLiveCamera();
+            showCapturedPhotoPreview(pendingPhotoDataUrl);
+        }
+
+        function handlePhotoFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            compressImageFileToSquare(file, (compressedUrl) => {
+                pendingPhotoDataUrl = compressedUrl;
+                stopLiveCamera();
+                showCapturedPhotoPreview(compressedUrl);
+            });
+        }
+
+        function showCapturedPhotoPreview(dataUrl) {
+            const img = document.getElementById('capturedPhotoPreview');
+            img.src = dataUrl;
+            img.classList.remove('hidden');
+            document.getElementById('cameraPlaceholder').classList.add('hidden');
+            document.getElementById('retakePhotoBtn').classList.remove('hidden');
+        }
+
+        function resetPhotoCapture() {
+            pendingPhotoDataUrl = null;
+            document.getElementById('capturedPhotoPreview').classList.add('hidden');
+            document.getElementById('retakePhotoBtn').classList.add('hidden');
+            document.getElementById('cameraPlaceholder').classList.remove('hidden');
         }
 
         function compressImageFileToSquare(file, callback) {
@@ -2957,7 +3969,9 @@
                     canvas.height = 400;
                     const ctx = canvas.getContext('2d');
                     const size = Math.min(img.width, img.height);
-                    ctx.drawImage(img, (img.width - size) / 2, (img.height - size) / 2, size, size, 0, 0, 400, 400);
+                    const sx = (img.width - size) / 2;
+                    const sy = (img.height - size) / 2;
+                    ctx.drawImage(img, sx, sy, size, size, 0, 0, 400, 400);
                     callback(canvas.toDataURL('image/jpeg', 0.72));
                 };
                 img.src = e.target.result;
@@ -2965,35 +3979,22 @@
             reader.readAsDataURL(file);
         }
 
-        function handlePhotoFileSelect(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            compressImageFileToSquare(file, (url) => {
-                pendingPhotoDataUrl = url;
-                const img = document.getElementById('capturedPhotoPreview');
-                img.src = url;
-                img.classList.remove('hidden');
-                document.getElementById('cameraPlaceholder').classList.add('hidden');
-                document.getElementById('retakePhotoBtn').classList.remove('hidden');
-            });
-        }
-
-        function resetPhotoCapture() {
-            pendingPhotoDataUrl = null;
-            document.getElementById('capturedPhotoPreview').classList.add('hidden');
-            document.getElementById('retakePhotoBtn').classList.add('hidden');
-            document.getElementById('cameraPlaceholder').classList.remove('hidden');
-        }
-
         function sendLocketItem() {
-            let finalImageData = currentCreatorMode === 'draw'
-                ? document.getElementById('drawingCanvas').toDataURL('image/jpeg', 0.78)
-                : pendingPhotoDataUrl;
+            let finalImageData = null;
 
-            if (!finalImageData) { showToast('Сначала выберите фото', 'error'); return; }
+            if (currentCreatorMode === 'draw') {
+                const canvas = document.getElementById('drawingCanvas');
+                finalImageData = canvas.toDataURL('image/jpeg', 0.78);
+            } else {
+                if (!pendingPhotoDataUrl) {
+                    showToast('Сначала сделайте снимок или выберите фотографию', 'error');
+                    return;
+                }
+                finalImageData = pendingPhotoDataUrl;
+            }
 
             const captionInput = document.getElementById('locketCaptionInput');
-            const captionText = captionInput.value.trim() || (currentCreatorMode === 'draw' ? 'Рисунок для тебя ✨' : 'Момент 📸');
+            const captionText = captionInput.value.trim() || (currentCreatorMode === 'draw' ? 'Теплый рисунок для тебя ✨' : 'Момент прямо сейчас 📸');
             const nowStr = new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
             const todayKey = getTodayDateKey();
 
@@ -3011,30 +4012,220 @@
             appState.locketFeed.unshift(newItem);
             if (appState.locketFeed.length > 15) appState.locketFeed.pop();
 
-            const existingDay = appState.dailyPhotos[todayKey] || { imageData: finalImageData, caption: captionText, author: getMyName(), updatedAt: Date.now(), drawingsHistory: [] };
-            if (!Array.isArray(existingDay.drawingsHistory)) existingDay.drawingsHistory = [];
-            existingDay.drawingsHistory.unshift({ id: newItem.id, type: currentCreatorMode, imageData: finalImageData, caption: captionText, author: getMyName(), time: nowStr });
-            existingDay.imageData = finalImageData;
-            existingDay.caption = captionText;
+            const existingDay = appState.dailyPhotos[todayKey] || {
+                imageData: finalImageData,
+                caption: captionText,
+                author: getMyName(),
+                updatedAt: Date.now(),
+                drawingsHistory: []
+            };
+            if (!Array.isArray(existingDay.drawingsHistory)) {
+                existingDay.drawingsHistory = [];
+            }
+            existingDay.drawingsHistory.unshift({
+                id: newItem.id,
+                type: currentCreatorMode,
+                imageData: finalImageData,
+                caption: captionText,
+                author: getMyName(),
+                time: nowStr
+            });
+            if (currentCreatorMode === 'photo' || !existingDay.imageData) {
+                existingDay.imageData = finalImageData;
+                existingDay.caption = captionText;
+                existingDay.author = getMyName();
+            }
+            existingDay.updatedAt = Date.now();
             appState.dailyPhotos[todayKey] = existingDay;
 
             captionInput.value = '';
-            if (currentCreatorMode === 'draw') clearDrawingCanvas(); else resetPhotoCapture();
-            saveAndSync('Отправлено партнеру! ✨');
+            if (currentCreatorMode === 'draw') {
+                clearDrawingCanvas();
+            } else {
+                resetPhotoCapture();
+            }
+
+            saveAndSync('Отправлено партнеру и добавлено в историю дня!');
         }
 
         function reactToLatestLocket() {
             if (!appState.locketFeed[0]) return;
             appState.locketFeed[0].hearts = (appState.locketFeed[0].hearts || 0) + 1;
+            const countEl = document.getElementById('locketHeartCount');
+            countEl.parentElement.classList.add('heart-pop');
+            setTimeout(() => countEl.parentElement.classList.remove('heart-pop'), 350);
             saveAndSync('Отправлено сердечко ❤️');
         }
 
-        function saveAndSync(msg) {
-            saveRoomLocally(true);
-            renderAll();
-            if (msg) showToast(msg);
+        // ============================================================================
+        // 12. ДЕЙСТВИЯ: АЛЬБОМ, ЗАМЕТКИ, НАПОМИНАНИЯ, СТАТУСЫ
+        // ============================================================================
+        function setMemoryFilter(filter) {
+            currentMemoryFilter = filter;
+            ['all', 'daily', 'locket', 'album'].forEach(f => {
+                const btn = document.getElementById('memFilter-' + f);
+                if (!btn) return;
+                if (f === filter) {
+                    btn.className = 'px-3.5 py-1.5 rounded-2xl text-xs font-semibold bg-brand-500 text-white transition';
+                } else {
+                    btn.className = 'px-3.5 py-1.5 rounded-2xl text-xs font-semibold bg-white text-slate-600 border border-slate-200 transition';
+                }
+            });
+            renderMemoriesTab();
         }
 
+        function openAddMemoryModal() {
+            pendingMemoryModalPhoto = null;
+            document.getElementById('memoryPhotoLabel').textContent = 'Выбрать фотографию момента';
+            document.getElementById('memoryTitleInput').value = '';
+            document.getElementById('memoryStoryInput').value = '';
+            document.getElementById('addMemoryModal').classList.remove('hidden');
+        }
+
+        function closeAddMemoryModal() {
+            document.getElementById('addMemoryModal').classList.add('hidden');
+        }
+
+        function handleMemoryModalPhoto(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            compressImageFileToSquare(file, (url) => {
+                pendingMemoryModalPhoto = url;
+                document.getElementById('memoryPhotoLabel').textContent = 'Фотография загружена ✓';
+            });
+        }
+
+        function saveNewMemoryCard() {
+            const title = document.getElementById('memoryTitleInput').value.trim();
+            const story = document.getElementById('memoryStoryInput').value.trim();
+
+            if (!title) {
+                showToast('Введите название воспоминания', 'error');
+                return;
+            }
+
+            const imageToUse = pendingMemoryModalPhoto || createInitialSampleDrawing();
+            const dateStr = new Date().toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' });
+
+            appState.memories.unshift({
+                id: 'mem-' + Date.now(),
+                title,
+                story,
+                date: dateStr,
+                imageData: imageToUse
+            });
+
+            closeAddMemoryModal();
+            saveAndSync('Воспоминание добавлено в альбом!');
+        }
+
+        function addReminder() {
+            const titleEl = document.getElementById('reminderTitleInput');
+            const dateEl = document.getElementById('reminderDateInput');
+            const timeEl = document.getElementById('reminderTimeInput');
+            const title = titleEl.value.trim();
+            if (!title) {
+                showToast('Напишите название плана или напоминания', 'error');
+                return;
+            }
+            appState.reminders.unshift({
+                id: 'rem-' + Date.now(),
+                title,
+                date: dateEl.value || getTodayDateKey(),
+                time: timeEl.value || '19:00',
+                done: false
+            });
+            titleEl.value = '';
+            saveAndSync('План с датой и временем добавлен');
+        }
+
+        function toggleReminder(id) {
+            const item = appState.reminders.find(r => r.id === id);
+            if (item) {
+                item.done = !item.done;
+                saveAndSync();
+            }
+        }
+
+        function deleteReminder(id) {
+            appState.reminders = appState.reminders.filter(r => r.id !== id);
+            saveAndSync('Напоминание удалено');
+        }
+
+        function addSharedNote() {
+            const titleEl = document.getElementById('noteTitleInput');
+            const contentEl = document.getElementById('noteContentInput');
+            const catEl = document.getElementById('noteCategoryInput');
+
+            if (!titleEl.value.trim() || !contentEl.value.trim()) {
+                showToast('Заполните заголовок и текст заметки', 'error');
+                return;
+            }
+
+            appState.notes.unshift({
+                id: 'note-' + Date.now(),
+                title: titleEl.value.trim(),
+                category: catEl.value,
+                content: contentEl.value.trim(),
+                author: getMyName()
+            });
+
+            titleEl.value = '';
+            contentEl.value = '';
+            saveAndSync('Общая заметка сохранена');
+        }
+
+        function deleteSharedNote(id) {
+            appState.notes = appState.notes.filter(n => n.id !== id);
+            saveAndSync('Заметка удалена');
+        }
+
+        function openAnniversaryModal() {
+            document.getElementById('anniversaryModal').classList.remove('hidden');
+        }
+        function closeAnniversaryModal() {
+            document.getElementById('anniversaryModal').classList.add('hidden');
+        }
+        function saveAnniversaryDate() {
+            const val = document.getElementById('anniversaryDateInput').value;
+            if (val) {
+                appState.anniversaryDate = val;
+                closeAnniversaryModal();
+                saveAndSync('Дата начала отношений обновлена');
+            }
+        }
+
+        function openMoodModal() {
+            const me = getMyMemberProfile();
+            selectedMoodEmoji = me.moodEmoji || '☕';
+            document.getElementById('moodTextInput').value = me.moodText || '';
+            document.getElementById('moodModal').classList.remove('hidden');
+        }
+        function closeMoodModal() {
+            document.getElementById('moodModal').classList.add('hidden');
+        }
+        function selectMoodEmoji(emoji) {
+            selectedMoodEmoji = emoji;
+            showToast(`Выбран эмодзи ${emoji}`);
+        }
+        function saveMyMood() {
+            const text = document.getElementById('moodTextInput').value.trim() || 'На связи';
+            const me = getMyMemberProfile();
+            me.moodEmoji = selectedMoodEmoji;
+            me.moodText = text;
+            closeMoodModal();
+            saveAndSync('Ваш статус обновлен');
+        }
+
+        function saveAndSync(toastMsg) {
+            saveRoomLocally(true);
+            renderAll();
+            if (toastMsg) showToast(toastMsg);
+        }
+
+        // ============================================================================
+        // 13. НАВИГАЦИЯ ПО ВКЛАДКАМ И УВЕДОМЛЕНИЯ
+        // ============================================================================
         function switchTab(tabId) {
             const tabs = ['menu', 'memories', 'food', 'notes', 'sync'];
             tabs.forEach(t => {
@@ -3049,292 +4240,42 @@
                     navBtn.className = 'flex flex-col items-center justify-center py-1.5 rounded-2xl text-slate-400 hover:text-slate-700 font-medium transition';
                 }
             });
+
             if (tabId !== 'menu') {
                 stopLiveCamera();
             }
-            if (tabId === 'sync') {
-                renderSyncTabState();
-            }
-            lucide.createIcons();
-        }
-
-        async function startLiveCamera() {
-            try {
-                mediaStream = await navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: 'user', width: { ideal: 720 }, height: { ideal: 720 } },
-                    audio: false
-                });
-                const video = document.getElementById('cameraStreamVideo');
-                video.srcObject = mediaStream;
-                video.classList.remove('hidden');
-                document.getElementById('cameraPlaceholder').classList.add('hidden');
-                document.getElementById('capturedPhotoPreview').classList.add('hidden');
-                document.getElementById('retakePhotoBtn').classList.add('hidden');
-                document.getElementById('cameraActiveControls').classList.remove('hidden');
-            } catch (e) {
-                showToast('Камера недоступна, нажмите «Выбрать / Снять»', 'error');
-            }
-        }
-
-        function stopLiveCamera() {
-            if (mediaStream) {
-                mediaStream.getTracks().forEach(track => track.stop());
-                mediaStream = null;
-            }
-            const video = document.getElementById('cameraStreamVideo');
-            if (video) video.classList.add('hidden');
-            const ctrls = document.getElementById('cameraActiveControls');
-            if (ctrls) ctrls.classList.add('hidden');
-            if (!pendingPhotoDataUrl) {
-                const ph = document.getElementById('cameraPlaceholder');
-                if (ph) ph.classList.remove('hidden');
-            }
-        }
-
-        function takeSnapshotFromVideo() {
-            const video = document.getElementById('cameraStreamVideo');
-            const c = document.createElement('canvas');
-            c.width = 480;
-            c.height = 480;
-            const ctx = c.getContext('2d');
-            const size = Math.min(video.videoWidth || 480, video.videoHeight || 480);
-            ctx.drawImage(video, ((video.videoWidth || 480) - size) / 2, ((video.videoHeight || 480) - size) / 2, size, size, 0, 0, 480, 480);
-            pendingPhotoDataUrl = c.toDataURL('image/jpeg', 0.78);
-            stopLiveCamera();
-            const img = document.getElementById('capturedPhotoPreview');
-            img.src = pendingPhotoDataUrl;
-            img.classList.remove('hidden');
-            document.getElementById('cameraPlaceholder').classList.add('hidden');
-            document.getElementById('retakePhotoBtn').classList.remove('hidden');
-        }
-
-        function setMemoryFilter(filter) {
-            currentMemoryFilter = filter;
-            ['all', 'daily', 'locket', 'album'].forEach(f => {
-                const btn = document.getElementById('memFilter-' + f);
-                if (!btn) return;
-                btn.className = f === filter
-                    ? 'px-3.5 py-1.5 rounded-2xl text-xs font-semibold bg-brand-500 text-white transition'
-                    : 'px-3.5 py-1.5 rounded-2xl text-xs font-semibold bg-white text-slate-600 border border-slate-200 transition';
-            });
-            renderMemoriesTab();
-        }
-
-        function openAddMemoryModal() {
-            pendingMemoryModalPhoto = null;
-            document.getElementById('memoryPhotoLabel').textContent = 'Выбрать фотографию момента';
-            document.getElementById('memoryTitleInput').value = '';
-            document.getElementById('memoryStoryInput').value = '';
-            document.getElementById('addMemoryModal').classList.remove('hidden');
-        }
-        function closeAddMemoryModal() { document.getElementById('addMemoryModal').classList.add('hidden'); }
-        function handleMemoryModalPhoto(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            compressImageFileToSquare(file, (url) => {
-                pendingMemoryModalPhoto = url;
-                document.getElementById('memoryPhotoLabel').textContent = 'Фотография загружена ✓';
-            });
-        }
-        function saveNewMemoryCard() {
-            const title = document.getElementById('memoryTitleInput').value.trim();
-            const story = document.getElementById('memoryStoryInput').value.trim();
-            if (!title) { showToast('Введите название события', 'error'); return; }
-            appState.memories.unshift({
-                id: 'mem-' + Date.now(),
-                title,
-                story,
-                date: new Date().toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' }),
-                imageData: pendingMemoryModalPhoto || createInitialSampleDrawing()
-            });
-            closeAddMemoryModal();
-            saveAndSync('Событие сохранено в альбом ✓');
-        }
-
-        function addReminder() {
-            const titleEl = document.getElementById('reminderTitleInput');
-            const dateEl = document.getElementById('reminderDateInput');
-            const timeEl = document.getElementById('reminderTimeInput');
-            const title = titleEl.value.trim();
-            if (!title) { showToast('Введите название плана', 'error'); return; }
-            appState.reminders.unshift({
-                id: 'rem-' + Date.now(),
-                title,
-                date: dateEl.value || getTodayDateKey(),
-                time: timeEl.value || '19:00',
-                done: false
-            });
-            titleEl.value = '';
-            saveAndSync('План добавлен ✓');
-        }
-        function toggleReminder(id) {
-            const item = appState.reminders.find(r => r.id === id);
-            if (item) { item.done = !item.done; saveAndSync(); }
-        }
-        function deleteReminder(id) {
-            appState.reminders = appState.reminders.filter(r => r.id !== id);
-            saveAndSync('План удален');
-        }
-
-        function addSharedNote() {
-            const titleEl = document.getElementById('noteTitleInput');
-            const contentEl = document.getElementById('noteContentInput');
-            const catEl = document.getElementById('noteCategoryInput');
-            if (!titleEl.value.trim() || !contentEl.value.trim()) {
-                showToast('Заполните заголовок и текст заметки', 'error');
-                return;
-            }
-            appState.notes.unshift({
-                id: 'note-' + Date.now(),
-                title: titleEl.value.trim(),
-                category: catEl.value,
-                content: contentEl.value.trim(),
-                author: getMyName()
-            });
-            titleEl.value = '';
-            contentEl.value = '';
-            saveAndSync('Заметка сохранена ✓');
-        }
-        function deleteSharedNote(id) {
-            appState.notes = appState.notes.filter(n => n.id !== id);
-            saveAndSync('Заметка удалена');
-        }
-
-        function openAddProductModal() {
-            selectedProductEmoji = '🥛';
-            document.getElementById('newProductNameInput').value = '';
-            document.getElementById('addProductModal').classList.remove('hidden');
-        }
-        function closeAddProductModal() { document.getElementById('addProductModal').classList.add('hidden'); }
-        function selectProductEmoji(emoji) { selectedProductEmoji = emoji; showToast(`Иконка ${emoji}`); }
-        function saveNewProductCloud() {
-            const name = document.getElementById('newProductNameInput').value.trim();
-            const priority = document.getElementById('newProductPriorityInput').value;
-            const stockMode = document.getElementById('newProductStockInput').value;
-            if (!name) { showToast('Введите название продукта', 'error'); return; }
-            appState.foodProducts.push({
-                id: 'prd-' + Date.now(),
-                name,
-                emoji: selectedProductEmoji || '🍎',
-                inStock: stockMode === 'stock',
-                priority: priority || 'essential'
-            });
-            closeAddProductModal();
-            saveAndSync('Продукт добавлен ✓');
-        }
-
-        function openCreateDishModal() {
-            selectedDishProductIds = [];
-            document.getElementById('newDishTitleInput').value = '';
-            renderDishBuilderSelector();
-            document.getElementById('createDishModal').classList.remove('hidden');
-        }
-        function closeCreateDishModal() { document.getElementById('createDishModal').classList.add('hidden'); }
-        function renderDishBuilderSelector() {
-            const selector = document.getElementById('dishBuilderCloudSelector');
-            const preview = document.getElementById('dishChainLivePreview');
-            if (!selector || !preview) return;
-            selector.innerHTML = '';
-            appState.foodProducts.forEach(prod => {
-                const isSelected = selectedDishProductIds.includes(prod.id);
-                const btn = document.createElement('button');
-                btn.type = 'button';
-                btn.onclick = () => {
-                    if (selectedDishProductIds.includes(prod.id)) {
-                        selectedDishProductIds = selectedDishProductIds.filter(id => id !== prod.id);
-                    } else {
-                        selectedDishProductIds.push(prod.id);
-                    }
-                    renderDishBuilderSelector();
-                };
-                btn.className = `inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold border transition ${isSelected ? 'bg-brand-500 text-white border-brand-500' : 'bg-white text-slate-700 border-slate-200'}`;
-                btn.innerHTML = `<span>${prod.emoji}</span><span>${escapeHtml(prod.name)}</span>`;
-                selector.appendChild(btn);
-            });
-            preview.textContent = selectedDishProductIds.length === 0
-                ? 'Выберите хотя бы 1 продукт выше...'
-                : selectedDishProductIds.map(id => {
-                    const p = appState.foodProducts.find(x => x.id === id);
-                    return p ? `${p.emoji} ${p.name}` : '';
-                }).filter(Boolean).join(' ➔ ');
-        }
-        function quickAddProductFromDishModal() {
-            const inp = document.getElementById('quickChainProductInput');
-            const name = inp.value.trim();
-            if (!name) return;
-            const newId = 'prd-' + Date.now();
-            appState.foodProducts.push({ id: newId, name, emoji: '🥗', inStock: false, priority: 'essential' });
-            selectedDishProductIds.push(newId);
-            inp.value = '';
-            renderDishBuilderSelector();
-        }
-        function saveNewDishChain() {
-            const title = document.getElementById('newDishTitleInput').value.trim();
-            const emoji = document.getElementById('newDishEmojiInput').value;
-            if (!title || selectedDishProductIds.length === 0) {
-                showToast('Укажите название блюда и выберите продукты', 'error');
-                return;
-            }
-            appState.dishChains.unshift({
-                id: 'dish-' + Date.now(),
-                title,
-                emoji: emoji || '🍝',
-                productIds: [...selectedDishProductIds]
-            });
-            closeCreateDishModal();
-            saveAndSync('Цепочка блюда сохранена ✓');
-        }
-
-        function openAnniversaryModal() { document.getElementById('anniversaryModal').classList.remove('hidden'); }
-        function closeAnniversaryModal() { document.getElementById('anniversaryModal').classList.add('hidden'); }
-        function saveAnniversaryDate() {
-            const val = document.getElementById('anniversaryDateInput').value;
-            if (val) {
-                appState.anniversaryDate = val;
-                closeAnniversaryModal();
-                saveAndSync('Дата начала отношений сохранена ✓');
-            }
-        }
-
-        function openMoodModal() {
-            const me = getMyMemberProfile();
-            selectedMoodEmoji = me.moodEmoji || '☕';
-            document.getElementById('moodTextInput').value = me.moodText || '';
-            document.getElementById('moodModal').classList.remove('hidden');
-        }
-        function closeMoodModal() { document.getElementById('moodModal').classList.add('hidden'); }
-        function selectMoodEmoji(emoji) { selectedMoodEmoji = emoji; showToast(`Выбран эмодзи ${emoji}`); }
-        function saveMyMood() {
-            const text = document.getElementById('moodTextInput').value.trim() || 'На связи';
-            const me = getMyMemberProfile();
-            me.moodEmoji = selectedMoodEmoji;
-            me.moodText = text;
-            closeMoodModal();
-            saveAndSync('Ваш статус обновлен ✓');
         }
 
         let toastTimer = null;
-        function showToast(msg, type = 'success') {
+        function showToast(message, type = 'success') {
             const banner = document.getElementById('toastBanner');
             const iconWrap = document.getElementById('toastIconWrap');
-            document.getElementById('toastText').textContent = msg;
+            document.getElementById('toastText').textContent = message;
+
             if (iconWrap) {
-                iconWrap.innerHTML = type === 'error'
-                    ? '<i data-lucide="x-circle" class="w-4 h-4 text-rose-400"></i>'
-                    : '<i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400"></i>';
+                if (type === 'error') {
+                    iconWrap.innerHTML = '<i data-lucide="x-circle" class="w-4 h-4 text-rose-400"></i>';
+                } else {
+                    iconWrap.innerHTML = '<i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400"></i>';
+                }
                 lucide.createIcons();
             }
+
             banner.classList.remove('opacity-0');
             banner.classList.add('opacity-100');
             clearTimeout(toastTimer);
             toastTimer = setTimeout(() => {
                 banner.classList.remove('opacity-100');
                 banner.classList.add('opacity-0');
-            }, 2600);
+            }, 2800);
         }
 
         function escapeHtml(str) {
-            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
         }
     </script>
 </body>
